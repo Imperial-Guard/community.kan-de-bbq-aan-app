@@ -53,17 +53,20 @@ test('pickAdvice met enkele item bucket retourneert dat item (zonder loop)', () 
   assert.equal(index, 0);
 });
 
+// Bouw een test-bank waar de current-season bucket >1 items heeft, ongeacht datum.
+// Dit maakt de test seizoen-onafhankelijk.
+function bankWithMultiItemSeason() {
+  const seasons = ['spring', 'summer', 'autumn', 'winter'];
+  const yes = {};
+  for (const s of seasons) yes[s] = ['A', 'B', 'C', 'D'];
+  return { yes };
+}
+
 test('pickAdvice probeert lastIndex te skippen wanneer bucket >1 items heeft', () => {
-  // Met een bucket van 4 items, en lastIndex bekend, geef de pick een kans om af te wijken
-  // We runnen 100x en checken dat we niet 100% lastIndex krijgen
-  const bucket = sampleBank.yes.summer; // 4 items
-  if (currentSeason() !== 'summer') {
-    // Test is alleen relevant als season=summer
-    return;
-  }
+  const bank = bankWithMultiItemSeason();
   let sawDifferent = false;
   for (let i = 0; i < 100; i++) {
-    const { index } = pickAdvice('yes', sampleBank, 0);
+    const { index } = pickAdvice('yes', bank, 0);
     if (index !== 0) { sawDifferent = true; break; }
   }
   assert.ok(sawDifferent, 'pickAdvice should occasionally pick non-lastIndex');
