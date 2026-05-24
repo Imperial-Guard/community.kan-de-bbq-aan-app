@@ -149,6 +149,10 @@
             "min": 0,
             "max": 100,
             "step": 1,
+            "title": {
+              "en": "Score",
+              "nl": "Score"
+            },
             "placeholder": {
               "en": "Score",
               "nl": "Score"
