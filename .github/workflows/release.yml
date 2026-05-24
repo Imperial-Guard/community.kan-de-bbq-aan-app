@@ -1,7 +1,9 @@
 name: release
 
-# Manual release workflow. Bumps the version, commits + tags, then publishes
-# to the Homey App Store. Requires a HOMEY_PAT secret with `app:publish` scope.
+# Manual release: bumps the version, commits + tags + pushes + creates a
+# GitHub release, then publishes to the Homey App Store. Requires:
+# - HOMEY secret containing a Personal Access Token from
+#   https://tools.developer.homey.app/me (Personal Access Tokens tab).
 
 on:
   workflow_dispatch:
@@ -15,12 +17,18 @@ on:
           - patch
           - minor
           - major
+      changelog:
+        description: Changelog (one short line, English, user-facing)
+        type: string
+        required: true
+        default: Maintenance release.
+
+permissions:
+  contents: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     steps:
@@ -42,20 +50,40 @@ jobs:
       - name: Run unit tests
         run: npm test
 
-      - name: Validate before bump (level=verified)
+      - name: Validate Homey app (level=verified)
         uses: athombv/github-action-homey-app-validate@master
         with:
           level: verified
 
-      - name: Bump version, commit and tag
+      - name: Bump version
+        id: bump
         uses: athombv/github-action-homey-app-version@master
         with:
           version: ${{ github.event.inputs.version_type }}
-          changelog: Release ${{ github.event.inputs.version_type }} bump
+          changelog: ${{ github.event.inputs.changelog }}
+
+      - name: Commit, tag, push, create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config --local user.name  "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(release): v${{ steps.bump.outputs.version }}"
+          git tag "v${{ steps.bump.outputs.version }}"
+          git push origin HEAD --tags
+          gh release create "v${{ steps.bump.outputs.version }}" \
+            -t "v${{ steps.bump.outputs.version }}" \
+            --notes "${{ github.event.inputs.changelog }}" \
+            --generate-notes
 
       - name: Publish to Homey App Store
+        id: publish
         uses: athombv/github-action-homey-app-publish@master
         with:
-          # Secret name in this repo is HOMEY (not HOMEY_PAT). Must be a
-          # Personal Access Token from https://tools.developer.homey.app/me.
           personal_access_token: ${{ secrets.HOMEY }}
+
+      - name: Surface manage-URL in run summary
+        run: |
+          echo "Manage your app release at ${{ steps.publish.outputs.url }}" >> $GITHUB_STEP_SUMMARY
