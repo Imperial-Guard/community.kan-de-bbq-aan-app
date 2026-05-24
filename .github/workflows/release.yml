@@ -1,0 +1,59 @@
+name: release
+
+# Manual release workflow. Bumps the version, commits + tags, then publishes
+# to the Homey App Store. Requires a HOMEY_PAT secret with `app:publish` scope.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: Semver bump
+        type: choice
+        required: true
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Validate before bump (level=verified)
+        uses: athombv/github-action-homey-app-validate@master
+        with:
+          level: verified
+
+      - name: Bump version, commit and tag
+        uses: athombv/github-action-homey-app-update-version@master
+        with:
+          version: ${{ github.event.inputs.version_type }}
+          changelog: Release ${{ github.event.inputs.version_type }} bump
+
+      - name: Publish to Homey App Store
+        uses: athombv/github-action-homey-app-publish@master
+        with:
+          personal_access_token: ${{ secrets.HOMEY_PAT }}
