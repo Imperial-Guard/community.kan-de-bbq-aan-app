@@ -12,6 +12,7 @@
     "preview": "node scripts/generate-previews.mjs"
   },
   "devDependencies": {
+    "homey-apps-sdk-v3-types": "^0.3.12",
     "puppeteer": "^25.0.4"
   }
 }
