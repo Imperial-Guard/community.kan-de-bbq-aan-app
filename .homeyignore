@@ -1,8 +1,9 @@
-# Dev-only files — not shipped to end users
+# Bestanden alleen voor development. Worden niet meegeleverd aan gebruikers.
 /preview/
 /docs/
 /test/
 /scripts/
+/private/
 /flame-preview.png
 /icon-preview.png
 /kettle-preview.png
