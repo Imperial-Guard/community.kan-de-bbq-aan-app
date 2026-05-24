@@ -334,13 +334,24 @@
       if (mm < 2)    return 'showerExpected';
       return 'heavyRain';
     }
-    function buildWeatherLine(data, L) {
+    // Returns DOM nodes for safe insertion via replaceChildren().
+    function buildWeatherNodes(data, L) {
       const parts = [];
       if (data.temperature != null) parts.push(Math.round(data.temperature) + '°');
       const wk = windKey(data.windSpeed); if (wk) parts.push(L.wind[wk]);
       const rk = rainKey(data.rain);      if (rk) parts.push(L.rain[rk]);
-      if (parts.length === 0) return '—';
-      return parts.join('<span class="dot">·</span>');
+      if (parts.length === 0) return [document.createTextNode('—')];
+      const nodes = [];
+      parts.forEach((p, i) => {
+        if (i > 0) {
+          const dot = document.createElement('span');
+          dot.className = 'dot';
+          dot.textContent = '·';
+          nodes.push(dot);
+        }
+        nodes.push(document.createTextNode(p));
+      });
+      return nodes;
     }
 
     // ============ Main ============
@@ -389,25 +400,43 @@
             const chip = document.getElementById('chip');
             chip.className = 'chip ' + scoreBucket(score);
 
-            document.getElementById('weather').innerHTML = buildWeatherLine(d, L);
+            const wLine = document.getElementById('weather');
+            wLine.replaceChildren(...buildWeatherNodes(d, L));
           }
 
           if (f && f.days) {
             // Skip today (index 0), show the next 3 days
             const upcoming = f.days.slice(1, 4);
             const row = document.getElementById('forecastRow');
-            row.innerHTML = '';
+            row.replaceChildren();
             for (const day of upcoming) {
               const dt = new Date(day.date + 'T12:00:00');
-              const el = document.createElement('div');
-              el.className = 'fday';
-              el.innerHTML =
-                '<div class="fdow">' + (L.days[dt.getDay()] || '') + '</div>' +
-                '<div class="fcell ' + day.status + '">' +
-                  '<img class="fbbq" src="assets/kettle.svg" alt="" />' +
-                  '<div class="fscore">' + day.score + '</div>' +
-                '</div>';
-              row.appendChild(el);
+              const safeStatus = ['yes', 'maybe', 'no'].includes(day.status) ? day.status : 'maybe';
+
+              const fday = document.createElement('div');
+              fday.className = 'fday';
+
+              const fdow = document.createElement('div');
+              fdow.className = 'fdow';
+              fdow.textContent = L.days[dt.getDay()] ?? '';
+              fday.appendChild(fdow);
+
+              const fcell = document.createElement('div');
+              fcell.className = 'fcell ' + safeStatus;
+
+              const fbbq = document.createElement('img');
+              fbbq.className = 'fbbq';
+              fbbq.src = 'assets/kettle.svg';
+              fbbq.alt = '';
+              fcell.appendChild(fbbq);
+
+              const fscore = document.createElement('div');
+              fscore.className = 'fscore';
+              fscore.textContent = String(day.score ?? '');
+              fcell.appendChild(fscore);
+
+              fday.appendChild(fcell);
+              row.appendChild(fday);
             }
           }
         } catch (e) { console.error(e); }

@@ -153,25 +153,42 @@
           const res = await Homey.api('GET', '/forecast');
           const days = res?.days ?? [];
           const grid = document.getElementById('grid');
-          grid.innerHTML = '';
+          grid.replaceChildren();
 
           const todayISO = new Date().toISOString().slice(0, 10);
 
           for (const d of days) {
             const dt = new Date(d.date + 'T12:00:00');
             const isToday = d.date === todayISO;
+            const safeStatus = ['yes', 'maybe', 'no'].includes(d.status) ? d.status : 'maybe';
 
-            const el = document.createElement('div');
-            el.className = 'day' + (isToday ? ' today' : '');
-            el.innerHTML =
-              '<div class="dow">' + L.days[dt.getDay()] + '</div>' +
-              '<div class="cell ' + d.status + '">' +
-                '<div class="icon">' +
-                  '<img class="ikettle" src="assets/kettle.svg" alt="" />' +
-                '</div>' +
-                '<div class="score">' + d.score + '</div>' +
-              '</div>';
-            grid.appendChild(el);
+            const day = document.createElement('div');
+            day.className = 'day' + (isToday ? ' today' : '');
+
+            const dow = document.createElement('div');
+            dow.className = 'dow';
+            dow.textContent = L.days[dt.getDay()] ?? '';
+            day.appendChild(dow);
+
+            const cell = document.createElement('div');
+            cell.className = 'cell ' + safeStatus;
+
+            const icon = document.createElement('div');
+            icon.className = 'icon';
+            const kettle = document.createElement('img');
+            kettle.className = 'ikettle';
+            kettle.src = 'assets/kettle.svg';
+            kettle.alt = '';
+            icon.appendChild(kettle);
+            cell.appendChild(icon);
+
+            const score = document.createElement('div');
+            score.className = 'score';
+            score.textContent = String(d.score ?? '');
+            cell.appendChild(score);
+
+            day.appendChild(cell);
+            grid.appendChild(day);
           }
         } catch (e) { console.error(e); }
         finally { refreshing = false; }

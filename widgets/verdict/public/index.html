@@ -272,13 +272,24 @@
       if (mm < 2)    return 'showerExpected';
       return 'heavyRain';
     }
-    function buildWeatherLine(data, L) {
+    // Returns an array of DOM nodes (alternating text + .dot spans) for safe insertion.
+    function buildWeatherNodes(data, L) {
       const parts = [];
       if (data.temperature != null) parts.push(Math.round(data.temperature) + '°');
       const wk = windKey(data.windSpeed); if (wk) parts.push(L.wind[wk]);
       const rk = rainKey(data.rain);      if (rk) parts.push(L.rain[rk]);
-      if (parts.length === 0) return '—';
-      return parts.join('<span class="dot">·</span>');
+      if (parts.length === 0) return [document.createTextNode('—')];
+      const nodes = [];
+      parts.forEach((p, i) => {
+        if (i > 0) {
+          const dot = document.createElement('span');
+          dot.className = 'dot';
+          dot.textContent = '·';
+          nodes.push(dot);
+        }
+        nodes.push(document.createTextNode(p));
+      });
+      return nodes;
     }
 
     function onHomeyReady(Homey) {
@@ -330,7 +341,8 @@
             document.getElementById('chipValue').textContent = data.score;
           }
 
-          document.getElementById('weather').innerHTML = buildWeatherLine(data, L);
+          const wLine = document.getElementById('weather');
+          wLine.replaceChildren(...buildWeatherNodes(data, L));
         } catch (e) { console.error(e); }
         finally { refreshing = false; }
       }
