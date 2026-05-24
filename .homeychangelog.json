@@ -2,8 +2,5 @@
   "1.0.0": {
     "en": "Initial release. Check today's BBQ verdict at a glance with three dashboard widgets and five Flow cards based on live Open-Meteo weather.",
     "nl": "Eerste release. Check vandaag in één oogopslag of de BBQ aan kan met drie dashboard-widgets en vijf Flow-kaarten op basis van live Open-Meteo weerdata."
-  },
-  "2.0.0": {
-    "en": "First release"
   }
 }
