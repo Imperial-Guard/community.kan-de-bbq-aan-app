@@ -48,7 +48,7 @@ jobs:
           level: verified
 
       - name: Bump version, commit and tag
-        uses: athombv/github-action-homey-app-update-version@master
+        uses: athombv/github-action-homey-app-version@master
         with:
           version: ${{ github.event.inputs.version_type }}
           changelog: Release ${{ github.event.inputs.version_type }} bump
