@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none">
+  <g id="weather-cloudy" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M78 178
+             H222
+             C240 178 254 164 254 146
+             C254 129 241 115 224 114
+             C217 91 196 76 172 76
+             C151 76 132 88 123 106
+             C116 101 107 98 98 98
+             C79 98 64 113 64 132
+             C64 136 65 140 66 144
+             C53 149 44 162 44 176
+             C44 195 59 210 78 210
+             H218"/>
+  </g>
+</svg>

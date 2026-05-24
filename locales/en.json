@@ -1,0 +1,135 @@
+{
+  "app": {
+    "name": "Kan de BBQ aan?",
+    "description": "Never guess your BBQ weather again."
+  },
+  "errors": {
+    "no_data": "No weather data yet. Please wait a moment while we fetch it.",
+    "weather_unavailable": "Weather data could not be retrieved. Please try again later."
+  },
+  "advice": {
+    "yes": {
+      "summer": [
+        "Fire it up",
+        "Smoke smells better today",
+        "Eat outside. No reason needed",
+        "The grill gets its moment",
+        "Cold drinks, hot grill"
+      ],
+      "spring": [
+        "Here we go again",
+        "Jacket on, grill on",
+        "First smoke of the year",
+        "Spring is finally helping",
+        "Call it summer practice"
+      ],
+      "autumn": [
+        "One more round",
+        "Sweater on, tongs ready",
+        "Quick, before it turns",
+        "Autumn grilling takes character"
+      ],
+      "winter": [
+        "Not normal. Still good",
+        "Cold? You're too far away",
+        "Coat zipped, grill open",
+        "This is what commitment smells like"
+      ]
+    },
+    "maybe": {
+      "summer": [
+        "Could work. Watch the sky",
+        "The sky looks suspicious",
+        "Keep the umbrella near the sauce",
+        "You're feeling brave, right?",
+        "Somewhere between rain and ribs"
+      ],
+      "spring": [
+        "Spring is being spring",
+        "The sun is trying",
+        "Don't celebrate yet",
+        "Bring a jacket, not confidence",
+        "Grill at your own risk"
+      ],
+      "autumn": [
+        "That's optimistic",
+        "Covered spot? Maybe",
+        "Tongs ready, backup too",
+        "The rain hasn't decided yet"
+      ],
+      "winter": [
+        "Ambitious, honestly",
+        "Possible. Questionable",
+        "Do not try this without a coat",
+        "This is more than a hobby"
+      ]
+    },
+    "no": {
+      "summer": [
+        "Not today",
+        "Put the lighter down",
+        "Even summer gave up",
+        "The grill stays clean",
+        "Try again tomorrow"
+      ],
+      "spring": [
+        "You trusted spring too soon",
+        "Save the charcoal",
+        "Classic spring behaviour",
+        "The kitchen wins today"
+      ],
+      "autumn": [
+        "Autumn shut it down",
+        "Too wet for heroics",
+        "Indoor food still counts",
+        "Give the grill the day off"
+      ],
+      "winter": [
+        "Obviously not. Look outside",
+        "Let the oven handle it",
+        "That's not BBQ. That's survival",
+        "Even the grill wants inside"
+      ]
+    }
+  },
+  "widget": {
+    "weather": {
+      "wind": {
+        "light": "light breeze",
+        "moderate": "moderate wind",
+        "strong": "strong wind",
+        "hard": "hard wind",
+        "gale": "gale incoming"
+      },
+      "rain": {
+        "dry": "dry",
+        "barelyWet": "barely wet",
+        "lightShower": "light shower",
+        "showerExpected": "shower expected",
+        "heavyRain": "heavy rain"
+      }
+    },
+    "verdict": {
+      "verdicts": {
+        "yes": "YES.",
+        "maybe": "MAYBE",
+        "no": "NO."
+      },
+      "loading": "Loading...",
+      "score": "Score"
+    },
+    "score": {
+      "kicker": "Today",
+      "upcoming": "Up next",
+      "max": "of 100",
+      "labels": {
+        "yes": "Fire it up!",
+        "maybe": "Maybe",
+        "no": "No BBQ"
+      }
+    },
+    "forecast": {
+      "days": ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+    }
+  }
+}

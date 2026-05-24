@@ -1,0 +1,135 @@
+{
+  "app": {
+    "name": "Kan de BBQ aan?",
+    "description": "Nooit meer gokken over het BBQ-weer."
+  },
+  "errors": {
+    "no_data": "Nog geen weerdata. Even geduld, we halen 'm op.",
+    "weather_unavailable": "Weersdata kon niet worden opgehaald. Probeer het later opnieuw."
+  },
+  "advice": {
+    "yes": {
+      "summer": [
+        "Kolen aan, zorgen uit",
+        "Slippers aan, tang in de hand",
+        "Buiten eten. Punt.",
+        "Het rooster mag weer werken",
+        "Koud drankje, warm vuur"
+      ],
+      "spring": [
+        "Daar gaan we weer",
+        "Jas aan, vuur aan",
+        "De eerste rookpluim mag",
+        "De lente doet vandaag mee",
+        "Dit telt als zomertraining"
+      ],
+      "autumn": [
+        "Nog één ronde dan",
+        "Trui aan, tang mee",
+        "Snel, voor het omslaat",
+        "Herfstgrillen heeft karakter"
+      ],
+      "winter": [
+        "Niet normaal. Wel lekker",
+        "Koud? Dan sta je te ver weg",
+        "Jas dicht, rooster open",
+        "Dit is karakter met kolen"
+      ]
+    },
+    "maybe": {
+      "summer": [
+        "Kan. Maar kijk omhoog",
+        "De lucht doet verdacht",
+        "Paraplu naast de saus",
+        "Jij durft wel, toch?",
+        "Tussen bui en bord"
+      ],
+      "spring": [
+        "Lenteweer. Dus chaos",
+        "De zon probeert het",
+        "Nog niet te vroeg juichen",
+        "Jasje aan, ego uit",
+        "Op eigen BBQ-risico"
+      ],
+      "autumn": [
+        "Dit is optimistisch",
+        "Afdakje? Dan misschien",
+        "Tang klaar, plan B ook",
+        "De bui twijfelt nog"
+      ],
+      "winter": [
+        "Ambitieus, hoor",
+        "Kan. Maar waarom?",
+        "Doe dit niet zonder jas",
+        "Dit is geen hobby meer"
+      ]
+    },
+    "no": {
+      "summer": [
+        "Laat maar zitten",
+        "Niet vandaag, grillbaas",
+        "Zelfs de zomer haakt af",
+        "De BBQ blijft schoon",
+        "Morgen nieuwe ronde"
+      ],
+      "spring": [
+        "Te vroeg gejuicht",
+        "Bewaar die kolen nog maar",
+        "De lente is weer bezig",
+        "Vandaag wint de keuken"
+      ],
+      "autumn": [
+        "De herfst heeft nee gezegd",
+        "Te nat voor stoere praat",
+        "Binnen eten telt ook",
+        "Het rooster krijgt vrij"
+      ],
+      "winter": [
+        "Natuurlijk niet. Kijk buiten",
+        "De oven mag het doen",
+        "Dit is geen BBQ, dit is survival",
+        "Zelfs de BBQ wil naar binnen"
+      ]
+    }
+  },
+  "widget": {
+    "weather": {
+      "wind": {
+        "light": "zachte wind",
+        "moderate": "matige wind",
+        "strong": "stevige wind",
+        "hard": "harde wind",
+        "gale": "storm op komst"
+      },
+      "rain": {
+        "dry": "droog",
+        "barelyWet": "nauwelijks nat",
+        "lightShower": "lichte bui",
+        "showerExpected": "bui verwacht",
+        "heavyRain": "flinke bui"
+      }
+    },
+    "verdict": {
+      "verdicts": {
+        "yes": "JA.",
+        "maybe": "TWIJFEL",
+        "no": "NEE."
+      },
+      "loading": "Laden...",
+      "score": "Score"
+    },
+    "score": {
+      "kicker": "Vandaag",
+      "upcoming": "Binnenkort",
+      "max": "van 100",
+      "labels": {
+        "yes": "Vuur aan!",
+        "maybe": "Twijfel",
+        "no": "Geen BBQ"
+      }
+    },
+    "forecast": {
+      "days": ["zo", "ma", "di", "wo", "do", "vr", "za"]
+    }
+  }
+}

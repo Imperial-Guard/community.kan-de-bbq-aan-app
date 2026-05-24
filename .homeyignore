@@ -1,0 +1,11 @@
+# Dev-only files — not shipped to end users
+/preview/
+/docs/
+/test/
+/flame-preview.png
+/icon-preview.png
+/kettle-preview.png
+/_stale_homeybuild*/
+/_stale_hb*/
+/README.md
+.DS_Store

@@ -1,0 +1,1 @@
+A playful Homey app with a wink for every outdoor cook: one glance at your dashboard tells you whether tonight calls for firing up the grill. No weather reports to read, no second app to open — just a clear YES, MAYBE, or NO for today and the week ahead. Weather data by Open-Meteo.

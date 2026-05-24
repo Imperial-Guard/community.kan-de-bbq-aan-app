@@ -1,0 +1,10 @@
+{
+  "title": {
+    "en": "It !{{is|isn't}} BBQ weather",
+    "nl": "Het !{{is|is geen}} BBQ-weer"
+  },
+  "hint": {
+    "en": "True when the current verdict is YES.",
+    "nl": "Waar wanneer het huidige verdict JA is."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": {
+    "en": "BBQ Verdict",
+    "nl": "BBQ Verdict"
+  },
+  "height": 220,
+  "transparent": true,
+  "settings": [
+    {
+      "id": "show_details",
+      "type": "checkbox",
+      "title": {
+        "en": "Show weather details",
+        "nl": "Toon weerdetails"
+      },
+      "value": true
+    }
+  ],
+  "api": {
+    "getStatus": {
+      "method": "GET",
+      "path": "/status"
+    },
+    "getI18n": {
+      "method": "GET",
+      "path": "/i18n"
+    }
+  }
+}

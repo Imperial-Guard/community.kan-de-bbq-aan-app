@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    :root {
+      --card-bg: linear-gradient(135deg, #FFF4D1 0%, #FFE29F 55%, #F5C061 100%);
+      --fg: #5C3D05;
+      --fg-muted: rgba(92, 61, 5, 0.7);
+      --border: rgba(92, 61, 5, 0.22);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--homey-font-family-regular, -apple-system, BlinkMacSystemFont, sans-serif);
+      color: var(--fg, #5C3D05);
+      background: var(--card-bg, #FFE29F);
+      overflow: hidden;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    .card {
+      position: relative;
+      height: 100%;
+      padding: 10px 14px 10px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      row-gap: 6px;
+      overflow: hidden;
+    }
+
+    body.yes   { --card-bg: linear-gradient(135deg, #D4E8B5 0%, #A5D46A 55%, #6FB528 100%); --fg: #1E3A0A; --fg-muted: rgba(30, 58, 10, 0.72); --border: rgba(30, 58, 10, 0.22); }
+    body.maybe { --card-bg: linear-gradient(135deg, #FFF4D1 0%, #FFE29F 55%, #F5C061 100%); --fg: #5C3D05; --fg-muted: rgba(92, 61, 5, 0.72); --border: rgba(92, 61, 5, 0.22); }
+    body.no    { --card-bg: linear-gradient(135deg, #F8D5CD 0%, #E89B8B 55%, #C4624F 100%); --fg: #5A1E0E; --fg-muted: rgba(90, 30, 14, 0.72); --border: rgba(90, 30, 14, 0.22); }
+
+    /* ============ TOP ROW: scene · info · chip ============ */
+    .top {
+      display: grid;
+      grid-template-columns: 124px 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* ===== Layered scene: weather glyph (top-left) + kettle (base) + flame (over grate) ===== */
+    .scene {
+      position: relative;
+      width: 124px;
+      height: 124px;
+    }
+    .scene img {
+      position: absolute;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+    }
+    .scene .kettle {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .scene .weather {
+      top: -2%;
+      left: -2%;
+      width: 32%;
+      height: 32%;
+      opacity: 0.95;
+      transition: opacity 0.4s ease;
+    }
+    /* Outer wrapper handelt score-gedreven base-scale af; inner img doet de flicker animatie */
+    .scene .flame-wrap {
+      position: absolute;
+      top: 14%;
+      left: 18%;
+      width: 36%;
+      height: 36%;
+      opacity: 0;
+      transform: scale(var(--flame-scale, 1));
+      transform-origin: 50% 100%;
+      transition: opacity 0.5s ease, transform 0.7s cubic-bezier(.34,1.4,.6,1);
+    }
+    .scene .flame {
+      width: 100%;
+      height: 100%;
+      transform-origin: 50% 100%;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.18));
+    }
+
+    body.yes   .scene .flame-wrap { opacity: 1; }
+    body.maybe .scene .flame-wrap { opacity: 0.55; }
+    body.no    .scene .flame-wrap { opacity: 0; }
+    body.yes   .scene .flame { animation: flicker 2.4s ease-in-out infinite; }
+    body.maybe .scene .flame { animation: sway 3.2s ease-in-out infinite; }
+
+    @keyframes flicker {
+      0%, 100% { transform: scale(1, 1)       translateY(0);    filter: brightness(1)    drop-shadow(0 1px 1px rgba(0,0,0,0.18)); }
+      25%      { transform: scale(1.04, 1.07) translateY(-0.5px); filter: brightness(1.08) drop-shadow(0 1px 2px rgba(238,107,57,0.4)); }
+      50%      { transform: scale(0.96, 0.94) translateY(0.3px);  filter: brightness(0.95) drop-shadow(0 1px 1px rgba(0,0,0,0.18)); }
+      75%      { transform: scale(1.02, 1.05) translateY(-0.2px); filter: brightness(1.04) drop-shadow(0 1px 2px rgba(238,107,57,0.3)); }
+    }
+    @keyframes sway {
+      0%, 100% { transform: translateX(0)    rotate(0deg); }
+      50%      { transform: translateX(1px)  rotate(-2deg); }
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .kicker {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+    .status {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .chip {
+      padding: 9px 16px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1;
+      min-width: 74px;
+      color: #FFFFFF;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        inset 0 -1px 0 rgba(0,0,0,0.15),
+        0 2px 6px rgba(0,0,0,0.18);
+      transition: background 0.5s ease;
+    }
+    .chip-hot  { background: linear-gradient(145deg, #FFB347 0%, #D85A30 60%, #A93F14 100%); }
+    .chip-warm { background: linear-gradient(145deg, #FFD54F 0%, #F5A623 60%, #B87A00 100%); }
+    .chip-cool { background: linear-gradient(145deg, #7A8FA8 0%, #4A5E78 60%, #2C3D52 100%); }
+
+    .chip .num {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      color: #FFFFFF;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+    }
+    .chip .unit {
+      margin-top: 3px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+    }
+
+    /* ============ WEATHER LINE ============ */
+    .weather-line {
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--fg);
+      letter-spacing: -0.005em;
+    }
+    .weather-line .dot {
+      opacity: 0.5;
+      font-weight: 900;
+      margin: 0 6px;
+    }
+
+    /* ============ 3-DAY MINI FORECAST ============ */
+    .upcoming {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-height: 0;
+    }
+    .upcoming-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      text-align: left;
+      padding-left: 2px;
+    }
+    .forecast-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      align-items: stretch;
+      flex: 1;
+      min-height: 0;
+    }
+    .fday {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 3px;
+      min-width: 0;
+    }
+    .fday .fdow {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      line-height: 1;
+      text-align: center;
+    }
+    .fcell {
+      width: 100%;
+      flex: 1;
+      min-height: 38px;
+      border-radius: 11px;
+      padding: 4px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      color: #FFFFFF;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        inset 0 -1px 0 rgba(0,0,0,0.18),
+        0 2px 5px rgba(0,0,0,0.18);
+    }
+    .fcell.yes   { background: linear-gradient(175deg, #9ED066 0%, #3E8B0F 100%); }
+    .fcell.maybe { background: linear-gradient(175deg, #FFD54F 0%, #F5A623 100%); color: #5A3D00; }
+    .fcell.no    { background: linear-gradient(175deg, #E89B8B 0%, #A03818 100%); }
+
+    /* Mini-BBQ silhouet links in elke pill — visueel consistent met de Forecast-widget */
+    .fcell .fbbq {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+      opacity: 0.95;
+    }
+    .fcell.yes .fbbq,
+    .fcell.no  .fbbq { filter: brightness(0) invert(1); }
+    .fcell.maybe .fbbq { filter: brightness(0); }
+
+    .fcell .fscore {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.18);
+    }
+  </style>
+</head>
+<body class="homey-widget-small">
+  <div class="card">
+    <div class="top">
+      <div class="scene" id="scene">
+        <img class="weather" id="weatherImg" src="assets/weather-sunny.svg" alt="" />
+        <img class="kettle" src="assets/kettle.svg" alt="" />
+        <div class="flame-wrap" id="flameWrap">
+          <img class="flame" id="flameImg" src="assets/flame.svg" alt="" />
+        </div>
+      </div>
+      <div class="info">
+        <div class="kicker" id="kicker">…</div>
+        <div class="status" id="status">…</div>
+      </div>
+      <div class="chip" id="chip">
+        <span class="num" id="num">—</span>
+        <span class="unit" id="max">—</span>
+      </div>
+    </div>
+
+    <div class="weather-line" id="weather">—</div>
+
+    <div class="upcoming">
+      <div class="upcoming-label" id="upcomingLabel">…</div>
+      <div class="forecast-row" id="forecastRow"></div>
+    </div>
+  </div>
+
+  <script>
+    // ============ Weather-glyph picker (status-aware) ============
+    // yes-day defaultet naar zon tenzij echt overcast — Open-Meteo cloudCover
+    // is vaak hoog door hoge cirrus, dus drempel strenger.
+    function pickWeather(d) {
+      const rain   = d.rain       ?? 0;
+      const wind   = d.windSpeed  ?? 0;
+      const gusts  = d.windGusts  ?? wind;
+      const temp   = d.temperature ?? 20;
+      const cloud  = d.cloudCover ?? 0;
+      const status = d.status;
+
+      if (temp <= 1 && rain > 0.1)   return 'snow';
+      if (rain > 1.5 && gusts > 50)  return 'storm';
+      if (rain > 0.4)                return 'rain';
+      if (gusts > 50 || wind > 40)   return 'wind';
+
+      if (status === 'yes' && cloud < 90) return 'sunny';
+      if (cloud > 75) return 'cloudy';
+      return 'sunny';
+    }
+
+    // ============ Score → chip colour bucket ============
+    function scoreBucket(score) {
+      if (score == null) return 'chip-warm';
+      if (score >= 70)  return 'chip-hot';
+      if (score >= 40)  return 'chip-warm';
+      return 'chip-cool';
+    }
+
+    // ============ Weather line buckets ============
+    function windKey(kmh) {
+      if (kmh == null) return null;
+      if (kmh < 12) return 'light';
+      if (kmh < 25) return 'moderate';
+      if (kmh < 35) return 'strong';
+      if (kmh < 50) return 'hard';
+      return 'gale';
+    }
+    function rainKey(mm) {
+      if (mm == null) return null;
+      if (mm <= 0.1) return 'dry';
+      if (mm < 0.5)  return 'barelyWet';
+      if (mm < 1)    return 'lightShower';
+      if (mm < 2)    return 'showerExpected';
+      return 'heavyRain';
+    }
+    function buildWeatherLine(data, L) {
+      const parts = [];
+      if (data.temperature != null) parts.push(Math.round(data.temperature) + '°');
+      const wk = windKey(data.windSpeed); if (wk) parts.push(L.wind[wk]);
+      const rk = rainKey(data.rain);      if (rk) parts.push(L.rain[rk]);
+      if (parts.length === 0) return '—';
+      return parts.join('<span class="dot">·</span>');
+    }
+
+    // ============ Main ============
+    function onHomeyReady(Homey) {
+      Homey.ready({ height: 260 });
+      let L = null;
+      const weatherImg = document.getElementById('weatherImg');
+
+      async function refresh() {
+        try {
+          if (!L) {
+            L = await Homey.api('GET', '/i18n');
+            if (L) {
+              document.getElementById('kicker').textContent = L.kicker;
+              document.getElementById('max').textContent = L.max;
+              document.getElementById('upcomingLabel').textContent = L.upcoming || '';
+            }
+          }
+          if (!L) return;
+
+          const [d, f] = await Promise.all([
+            Homey.api('GET', '/status'),
+            Homey.api('GET', '/forecast'),
+          ]);
+
+          if (d && !d.error) {
+            const s = d.status || 'maybe';
+            document.body.className = 'homey-widget ' + s;
+
+            // Swap weather glyph
+            const wk = pickWeather(d);
+            const nextSrc = 'assets/weather-' + wk + '.svg';
+            if (!weatherImg.src.endsWith(nextSrc)) weatherImg.src = nextSrc;
+
+            const score = Math.max(0, Math.min(100, d.score ?? 0));
+            document.getElementById('num').textContent = score;
+            document.getElementById('status').textContent = L.labels[s] || '—';
+
+            // Vlam schaalt mee met score: range 0.5 .. 1.1
+            const flameScale = (0.5 + (score / 100) * 0.6).toFixed(2);
+            document.documentElement.style.setProperty('--flame-scale', flameScale);
+
+            const chip = document.getElementById('chip');
+            chip.className = 'chip ' + scoreBucket(score);
+
+            document.getElementById('weather').innerHTML = buildWeatherLine(d, L);
+          }
+
+          if (f && f.days) {
+            // Skip today (index 0), show the next 3 days
+            const upcoming = f.days.slice(1, 4);
+            const row = document.getElementById('forecastRow');
+            row.innerHTML = '';
+            for (const day of upcoming) {
+              const dt = new Date(day.date + 'T12:00:00');
+              const el = document.createElement('div');
+              el.className = 'fday';
+              el.innerHTML =
+                '<div class="fdow">' + (L.days[dt.getDay()] || '') + '</div>' +
+                '<div class="fcell ' + day.status + '">' +
+                  '<img class="fbbq" src="assets/kettle.svg" alt="" />' +
+                  '<div class="fscore">' + day.score + '</div>' +
+                '</div>';
+              row.appendChild(el);
+            }
+          }
+        } catch (e) { console.error(e); }
+      }
+      refresh();
+      setInterval(refresh, 5 * 60 * 1000);
+    }
+  </script>
+</body>
+</html>

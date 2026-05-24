@@ -1,0 +1,12 @@
+{
+  "name": {
+    "en": "BBQ Forecast",
+    "nl": "BBQ-vooruitblik"
+  },
+  "height": 140,
+  "transparent": true,
+  "api": {
+    "getForecast": { "method": "GET", "path": "/forecast" },
+    "getI18n":     { "method": "GET", "path": "/i18n" }
+  }
+}

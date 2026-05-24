@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--homey-font-family-regular, -apple-system, BlinkMacSystemFont, sans-serif);
+      overflow: hidden;
+      /* Transparent — pills floaten op de Homey-dashboard achtergrond zelf,
+         dus past automatisch bij licht/donker thema zonder laag-effect. */
+      background: transparent;
+      color: var(--homey-text-color, #1B1B1B);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      height: 100%;
+      padding: 8px 10px;
+    }
+    .day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+    }
+    .dow {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      /* Gebruikt Homey's text-color die mee adapteert met thema */
+      color: var(--homey-text-color, #1B1B1B);
+      opacity: 0.72;
+      line-height: 1;
+    }
+    .day.today .dow {
+      color: #D85A30;
+      opacity: 1;
+    }
+    /* OS-fallback wanneer Homey-variabele ontbreekt */
+    @media (prefers-color-scheme: dark) {
+      .dow { color: var(--homey-text-color, #F5F5F5); }
+    }
+
+    .cell {
+      flex: 1;
+      width: 100%;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
+      padding: 7px 2px 7px;
+      isolation: isolate;
+      gap: 4px;
+    }
+    .cell::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: var(--bg);
+    }
+    .cell::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(0,0,0,0.06) 100%);
+      pointer-events: none;
+    }
+
+    /* Traffic-light per dag: groen = doe het, amber = twijfel, rood = niet doen */
+    .cell.yes   { --bg: linear-gradient(175deg, #9ED066 0%, #3E8B0F 100%); color: #FFFFFF; }
+    .cell.maybe { --bg: linear-gradient(175deg, #FFD54F 0%, #F5A623 100%); color: #5A3D00; }
+    .cell.no    { --bg: linear-gradient(175deg, #E89B8B 0%, #A03818 100%); color: #FFFFFF; }
+
+    .day.today .cell {
+      box-shadow: 0 0 0 2px #D85A30, 0 2px 10px rgba(216, 90, 48, 0.55);
+    }
+
+    /* ============ Mini BBQ silhouet per day-pill ============ */
+    .icon {
+      position: relative;
+      width: 48px;
+      height: 48px;
+    }
+    .icon img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+    }
+    /* Sterke gevulde silhouet — leest beter op klein formaat dan een outline-tekening.
+       Op groen/rood draaien we naar wit voor contrast, op amber blijft hij donker. */
+    .cell.yes .icon .ikettle,
+    .cell.no  .icon .ikettle {
+      filter: brightness(0) invert(1);
+    }
+    .cell.maybe .icon .ikettle {
+      filter: brightness(0);
+    }
+
+    .score {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body class="homey-widget-small">
+  <div class="grid" id="grid"></div>
+
+  <script>
+    function onHomeyReady(Homey) {
+      Homey.ready({ height: 140 });
+      let L = null;
+
+      async function refresh() {
+        try {
+          if (!L) L = await Homey.api('GET', '/i18n');
+          if (!L) return;
+
+          const res = await Homey.api('GET', '/forecast');
+          const days = res?.days ?? [];
+          const grid = document.getElementById('grid');
+          grid.innerHTML = '';
+
+          const todayISO = new Date().toISOString().slice(0, 10);
+
+          for (const d of days) {
+            const dt = new Date(d.date + 'T12:00:00');
+            const isToday = d.date === todayISO;
+
+            const el = document.createElement('div');
+            el.className = 'day' + (isToday ? ' today' : '');
+            el.innerHTML =
+              '<div class="dow">' + L.days[dt.getDay()] + '</div>' +
+              '<div class="cell ' + d.status + '">' +
+                '<div class="icon">' +
+                  '<img class="ikettle" src="assets/kettle.svg" alt="" />' +
+                '</div>' +
+                '<div class="score">' + d.score + '</div>' +
+              '</div>';
+            grid.appendChild(el);
+          }
+        } catch (e) { console.error(e); }
+      }
+
+      refresh();
+      setInterval(refresh, 5 * 60 * 1000);
+    }
+  </script>
+</body>
+</html>

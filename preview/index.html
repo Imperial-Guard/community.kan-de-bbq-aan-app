@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BBQ widgets — preview</title>
+  <style>
+    :root {
+      --bg: #0F1114;
+      --panel: #181B20;
+      --panel-hover: #1F2329;
+      --border: #282C34;
+      --text: #E8E9EB;
+      --text-muted: #8C929E;
+      --accent: #D85A30;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    body { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; }
+
+    header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+    header h1 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+    header .sub { color: var(--text-muted); font-size: 12px; }
+
+    main {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 0;
+      min-height: 0;
+    }
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    /* ===== Controls panel ===== */
+    .controls {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .section { margin-bottom: 20px; }
+    .section-title {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .scenarios { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .scenarios button {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: left;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .scenarios button:hover { background: var(--panel-hover); border-color: #3A3F48; }
+    .scenarios button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .radio-group { display: flex; gap: 4px; flex-wrap: wrap; }
+    .radio-group label {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .radio-group label:hover { background: var(--panel-hover); }
+    .radio-group input { display: none; }
+    .radio-group input:checked + span { color: var(--accent); }
+    .radio-group label:has(input:checked) { background: rgba(216, 90, 48, 0.12); border-color: var(--accent); }
+
+    .slider-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .slider-row label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .slider-row .value { font-variant-numeric: tabular-nums; font-size: 12px; font-weight: 700; min-width: 70px; text-align: right; color: var(--text); }
+    .slider-row input[type="range"] {
+      grid-column: 1 / -1;
+      width: 100%;
+      accent-color: var(--accent);
+    }
+    .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+    .checkbox-row input { accent-color: var(--accent); }
+
+    .computed {
+      padding: 12px;
+      background: var(--panel-hover);
+      border-radius: 6px;
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 10px;
+    }
+    .computed .k { color: var(--text-muted); }
+    .computed .v { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .computed .v.yes   { color: #7CB342; }
+    .computed .v.maybe { color: #F5A623; }
+    .computed .v.no    { color: #C4624F; }
+
+    /* ===== Preview panel ===== */
+    .preview {
+      padding: 24px;
+      overflow-y: auto;
+      background:
+        radial-gradient(circle at top, #1a1e24 0%, var(--bg) 60%);
+    }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 20px;
+    }
+    .widget-card {
+      background: #0A0B0E;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .widget-card h3 {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .widget-card h3 .dim { color: var(--text-muted); font-weight: 500; font-size: 11px; letter-spacing: 0.04em; text-transform: none; }
+    .widget-card iframe {
+      width: 100%;
+      border: 0;
+      display: block;
+      background: transparent;
+    }
+    .widget-card.wide { grid-column: 1 / -1; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🔥 BBQ widgets — preview</h1>
+    <span class="sub">Speel met de sliders of kies een scenario. Widgets rerenderen meteen.</span>
+  </header>
+
+  <main>
+    <aside class="controls">
+      <div class="section">
+        <div class="section-title">Scenario</div>
+        <div class="scenarios" id="scenarios">
+          <button data-scenario="summer">☀️ Mooie zomerdag</button>
+          <button data-scenario="spring">🌤 Voorjaar</button>
+          <button data-scenario="iffy">🌥 Twijfel</button>
+          <button data-scenario="storm">🌬 Najaarsstorm</button>
+          <button data-scenario="rain">🌧 Natte dag</button>
+          <button data-scenario="winter">❄️ Koude winter</button>
+          <button data-scenario="edge">🧪 Randgeval</button>
+          <button data-scenario="peak">🔥 Perfect</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Taal (device-locale)</div>
+        <div class="radio-group" id="langGroup">
+          <label><input type="radio" name="lang" value="nl" checked><span>Nederlands</span></label>
+          <label><input type="radio" name="lang" value="en"><span>English</span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Status override</div>
+        <div class="radio-group" id="statusGroup">
+          <label><input type="radio" name="status" value="auto" checked><span>Auto (uit weer)</span></label>
+          <label><input type="radio" name="status" value="yes"><span>JA</span></label>
+          <label><input type="radio" name="status" value="maybe"><span>TWIJFEL</span></label>
+          <label><input type="radio" name="status" value="no"><span>NEE</span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Weer (avondvenster 17-21u)</div>
+
+        <div class="slider-row">
+          <label for="temp">Temperatuur</label>
+          <span class="value" id="tempV">22°C</span>
+          <input type="range" id="temp" min="-5" max="35" step="0.5" value="22">
+        </div>
+        <div class="slider-row">
+          <label for="wind">Wind (km/u)</label>
+          <span class="value" id="windV">10</span>
+          <input type="range" id="wind" min="0" max="80" step="1" value="10">
+        </div>
+        <div class="slider-row">
+          <label for="rain">Regen (mm)</label>
+          <span class="value" id="rainV">0.0</span>
+          <input type="range" id="rain" min="0" max="10" step="0.1" value="0">
+        </div>
+        <div class="slider-row">
+          <label for="humidity">Luchtvochtigheid</label>
+          <span class="value" id="humidityV">60%</span>
+          <input type="range" id="humidity" min="30" max="100" step="1" value="60">
+        </div>
+        <div class="slider-row">
+          <label for="cloud">Bewolking</label>
+          <span class="value" id="cloudV">30%</span>
+          <input type="range" id="cloud" min="0" max="100" step="1" value="30">
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Widget-setting</div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="details" checked>
+          Toon weerdetails in Verdict
+        </label>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Berekend</div>
+        <div class="computed" id="computed">
+          <span class="k">Score</span>         <span class="v" id="cScore">—</span>
+          <span class="k">Status</span>        <span class="v" id="cStatus">—</span>
+          <span class="k">Knock-outs</span>    <span class="v" id="cKO">—</span>
+          <span class="k">Seizoen</span>       <span class="v" id="cSeason">—</span>
+          <span class="k">Advies</span>        <span class="v" id="cAdvice">—</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="preview">
+      <div class="preview-grid">
+        <div class="widget-card">
+          <h3>Verdict <span class="dim">220px</span></h3>
+          <iframe id="fVerdict" data-widget="verdict" data-src="/widgets/verdict/public/index.html" style="height: 220px;"></iframe>
+        </div>
+        <div class="widget-card">
+          <h3>Score <span class="dim">120px</span></h3>
+          <iframe id="fScore" data-widget="score" data-src="/widgets/score/public/index.html" style="height: 220px;"></iframe>
+        </div>
+        <div class="widget-card wide">
+          <h3>Forecast <span class="dim">140px — 7 dagen</span></h3>
+          <iframe id="fForecast" data-widget="forecast" data-src="/widgets/forecast/public/index.html" style="height: 140px;"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    // ============ Load locales (single source of truth) ============
+    const [NL, EN] = await Promise.all([
+      fetch('/locales/nl.json').then(r => r.json()),
+      fetch('/locales/en.json').then(r => r.json()),
+    ]);
+    const LOCALES = { nl: NL, en: EN };
+
+    // ============ Scoring (mirror of lib/bbq-algorithm.js) ============
+    function tempScore(t)      { if(t<10)return 0; if(t<15)return 30+(t-10)*8; if(t<18)return 70+(t-15)*10; if(t<=25)return 100; if(t<=30)return 100-(t-25)*4; return 80; }
+    function rainScore(mm)     { if(mm>2)return 0; if(mm>1)return 30; if(mm>0.5)return 70; return 100; }
+    function windScore(s, g)   { if(g>65)return 0; if(g>45)return 20; if(s>45||g>35)return 40; if(s>25)return 60; if(s>15)return 80; return 100; }
+    function humidityScore(h)  { if(h>90)return 20; if(h>85)return 50; if(h>75)return 75; if(h>=30)return 100; return 85; }
+    function cloudScore(c)     { if(c>75)return 60; if(c>50)return 75; if(c>25)return 90; return 100; }
+    const WEIGHTS = { temp: 0.30, rain: 0.25, wind: 0.20, humidity: 0.15, cloud: 0.10 };
+
+    function computeScore(c) {
+      const gusts = c.windSpeed * 1.45; // approximate gusts from sustained wind
+      const knock = {
+        tooCold:  c.temperature < 10,
+        tooWet:   c.precipitation > 2,
+        tooWindy: gusts > 65,
+      };
+      const raw = Math.round(
+        tempScore(c.temperature) * WEIGHTS.temp +
+        rainScore(c.precipitation) * WEIGHTS.rain +
+        windScore(c.windSpeed, gusts) * WEIGHTS.wind +
+        humidityScore(c.humidity) * WEIGHTS.humidity +
+        cloudScore(c.cloudCover) * WEIGHTS.cloud
+      );
+      const isKO = knock.tooCold || knock.tooWet || knock.tooWindy;
+      const score = isKO ? Math.min(raw, 40) : raw;
+      const status = score >= 75 ? 'yes' : score >= 45 ? 'maybe' : 'no';
+      return { status, score, knock, gusts };
+    }
+
+    // ============ Season ============
+    function currentSeason() {
+      const m = new Date().getMonth();
+      if (m >= 2 && m <= 4)  return 'spring';
+      if (m >= 5 && m <= 7)  return 'summer';
+      if (m >= 8 && m <= 10) return 'autumn';
+      return 'winter';
+    }
+
+    function pickAdvice(status, locale) {
+      const bank = LOCALES[locale].advice[status][currentSeason()];
+      return bank[Math.floor(Math.random() * bank.length)];
+    }
+
+    // ============ Build mock forecast (varied statuses across 7 days) ============
+    function buildForecast(todayStatus, todayScore) {
+      const today = new Date();
+      const todayIso = today.toISOString().slice(0, 10);
+      const template = [todayStatus, 'yes', 'maybe', 'yes', 'no', 'no', 'maybe'];
+      const scoreMap = { yes: 82, maybe: 58, no: 28 };
+      const days = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(today); d.setDate(today.getDate() + i);
+        const s = i === 0 ? todayStatus : template[i];
+        const base = i === 0 ? todayScore : scoreMap[s];
+        const jitter = i === 0 ? 0 : Math.floor(Math.random() * 14) - 7;
+        days.push({
+          date: d.toISOString().slice(0, 10),
+          status: s,
+          score: Math.max(0, Math.min(100, base + jitter)),
+        });
+      }
+      return days;
+    }
+
+    // ============ Read control state ============
+    function readControls() {
+      const conditions = {
+        temperature:   parseFloat(document.getElementById('temp').value),
+        precipitation: parseFloat(document.getElementById('rain').value),
+        windSpeed:     parseFloat(document.getElementById('wind').value),
+        humidity:      parseFloat(document.getElementById('humidity').value),
+        cloudCover:    parseFloat(document.getElementById('cloud').value),
+      };
+      const lang     = document.querySelector('input[name="lang"]:checked').value;
+      const override = document.querySelector('input[name="status"]:checked').value;
+      const details  = document.getElementById('details').checked;
+      return { conditions, lang, override, details };
+    }
+
+    function buildState() {
+      const c = readControls();
+      const computed = computeScore(c.conditions);
+      const status = c.override === 'auto' ? computed.status : c.override;
+      const score  = c.override === 'auto'
+        ? computed.score
+        : (status === 'yes' ? 82 : status === 'maybe' ? 58 : 28);
+      const advice = pickAdvice(status, c.lang);
+      const forecast = buildForecast(status, score);
+      return { ...c, status, score, advice, forecast, computed };
+    }
+
+    // ============ Mock Homey factory ============
+    function makeMockHomey(iframe, state) {
+      const widget = iframe.dataset.widget;
+      return {
+        ready(opts) { /* no-op — iframe height is fixed from harness */ },
+        getSettings() { return { show_details: state.details }; },
+        getLanguage() { return state.lang; },
+        async api(method, path) {
+          if (path === '/status') {
+            return {
+              status:      state.status,
+              score:       state.score,
+              advice:      state.advice,
+              temperature: state.conditions.temperature,
+              windSpeed:   state.conditions.windSpeed,
+              windGusts:   state.conditions.windGusts,
+              rain:        state.conditions.precipitation,
+              humidity:    state.conditions.humidity,
+              cloudCover:  state.conditions.cloudCover,
+              updatedAt:   Date.now(),
+            };
+          }
+          if (path === '/forecast') {
+            return { days: state.forecast };
+          }
+          if (path === '/i18n') {
+            const w = LOCALES[state.lang].widget;
+            if (widget === 'verdict') {
+              return {
+                verdicts: w.verdict.verdicts,
+                loading:  w.verdict.loading,
+                score:    w.verdict.score,
+                wind:     w.weather.wind,
+                rain:     w.weather.rain,
+              };
+            }
+            if (widget === 'score') {
+              return {
+                kicker:   w.score.kicker,
+                upcoming: w.score.upcoming,
+                max:      w.score.max,
+                labels:   w.score.labels,
+                days:     w.forecast.days,
+                wind:     w.weather.wind,
+                rain:     w.weather.rain,
+              };
+            }
+            if (widget === 'forecast') {
+              return { days: w.forecast.days };
+            }
+          }
+          return null;
+        },
+      };
+    }
+
+    // ============ Reload iframes and inject mock ============
+    const IFRAMES = document.querySelectorAll('iframe[data-widget]');
+
+    function renderIframes(state) {
+      IFRAMES.forEach(iframe => {
+        const url = iframe.dataset.src + '?t=' + Date.now();
+        iframe.onload = () => {
+          const fn = iframe.contentWindow && iframe.contentWindow.onHomeyReady;
+          if (typeof fn === 'function') {
+            try { fn(makeMockHomey(iframe, state)); }
+            catch (e) { console.error('widget injection failed:', e); }
+          }
+        };
+        iframe.src = url;
+      });
+    }
+
+    // ============ Update readouts ============
+    function updateReadouts(state) {
+      document.getElementById('tempV').textContent     = state.conditions.temperature.toFixed(1).replace('.0','') + '°C';
+      document.getElementById('windV').textContent     = state.conditions.windSpeed + ' km/u';
+      document.getElementById('rainV').textContent     = state.conditions.precipitation.toFixed(1) + ' mm';
+      document.getElementById('humidityV').textContent = state.conditions.humidity + '%';
+      document.getElementById('cloudV').textContent    = state.conditions.cloudCover + '%';
+
+      document.getElementById('cScore').textContent   = state.score;
+      const cStat = document.getElementById('cStatus');
+      cStat.textContent = state.status.toUpperCase();
+      cStat.className = 'v ' + state.status;
+
+      const ko = state.computed.knock;
+      const kos = [
+        ko.tooCold  ? 'te koud'   : null,
+        ko.tooWet   ? 'te nat'    : null,
+        ko.tooWindy ? 'te winderig' : null,
+      ].filter(Boolean);
+      document.getElementById('cKO').textContent = kos.length ? kos.join(', ') : 'geen';
+
+      document.getElementById('cSeason').textContent = currentSeason();
+      document.getElementById('cAdvice').textContent = '"' + state.advice + '"';
+    }
+
+    // ============ Render pipeline ============
+    function render() {
+      const state = buildState();
+      updateReadouts(state);
+      renderIframes(state);
+    }
+
+    // ============ Scenarios ============
+    const SCENARIOS = {
+      summer: { temp: 24,  wind: 8,  rain: 0,   humidity: 55, cloud: 20 },
+      spring: { temp: 17,  wind: 12, rain: 0,   humidity: 65, cloud: 40 },
+      iffy:   { temp: 16,  wind: 22, rain: 0.4, humidity: 78, cloud: 65 },
+      storm:  { temp: 12,  wind: 48, rain: 0.8, humidity: 80, cloud: 90 },
+      rain:   { temp: 14,  wind: 18, rain: 3.5, humidity: 92, cloud: 95 },
+      winter: { temp: 1,   wind: 10, rain: 0.4, humidity: 88, cloud: 90 },
+      edge:   { temp: 10,  wind: 25, rain: 1.9, humidity: 84, cloud: 74 },
+      peak:   { temp: 22,  wind: 5,  rain: 0,   humidity: 50, cloud: 15 },
+    };
+
+    const scenarioButtons = document.querySelectorAll('#scenarios button');
+    scenarioButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const s = SCENARIOS[btn.dataset.scenario];
+        document.getElementById('temp').value     = s.temp;
+        document.getElementById('wind').value     = s.wind;
+        document.getElementById('rain').value     = s.rain;
+        document.getElementById('humidity').value = s.humidity;
+        document.getElementById('cloud').value    = s.cloud;
+        document.querySelector('input[name="status"][value="auto"]').checked = true;
+        scenarioButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        render();
+      });
+    });
+
+    // ============ Wire controls ============
+    document.querySelectorAll('input[type="range"], input[type="radio"], input[type="checkbox"]')
+      .forEach(el => el.addEventListener('input', () => {
+        // clear scenario highlight on manual change
+        if (el.type === 'range') scenarioButtons.forEach(b => b.classList.remove('active'));
+        render();
+      }));
+
+    // ============ Initial render ============
+    render();
+  </script>
+</body>
+</html>

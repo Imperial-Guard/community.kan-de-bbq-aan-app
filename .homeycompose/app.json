@@ -1,0 +1,35 @@
+{
+  "id": "nl.bbqaan.app",
+  "version": "1.0.0",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "platforms": ["local"],
+  "brandColor": "#D85A30",
+  "name": {
+    "en": "Kan de BBQ aan?",
+    "nl": "Kan de BBQ aan?"
+  },
+  "description": {
+    "en": "Never guess your BBQ weather again. Weather data by Open-Meteo.",
+    "nl": "Nooit meer gokken over het BBQ-weer. Weerdata van Open-Meteo."
+  },
+  "tags": {
+    "en": ["BBQ", "barbecue", "grill", "weather", "outdoor", "summer"],
+    "nl": ["BBQ", "barbecue", "grill", "weer", "buiten", "zomer"]
+  },
+  "category": ["climate"],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Paul Vermeulen",
+    "email": "33509000+Imperial-Guard@users.noreply.github.com"
+  },
+  "contributors": {
+    "developers": []
+  },
+  "support": "mailto:33509000+Imperial-Guard@users.noreply.github.com"
+}

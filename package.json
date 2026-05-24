@@ -1,0 +1,12 @@
+{
+  "name": "nl.bbqaan.app",
+  "version": "1.0.0",
+  "description": "Kan de BBQ aan? — a Homey app",
+  "main": "app.js",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "validate": "homey app validate --level publish",
+    "preview": "node preview/serve.js"
+  }
+}

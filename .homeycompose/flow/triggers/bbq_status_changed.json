@@ -1,0 +1,30 @@
+{
+  "title": {
+    "en": "BBQ verdict changed",
+    "nl": "BBQ-verdict is veranderd"
+  },
+  "hint": {
+    "en": "Fires when the BBQ verdict changes to yes, maybe or no.",
+    "nl": "Start wanneer het BBQ-verdict verandert naar ja, twijfel of nee."
+  },
+  "tokens": [
+    {
+      "name": "status",
+      "type": "string",
+      "title": { "en": "Status", "nl": "Status" },
+      "example": "yes"
+    },
+    {
+      "name": "advice",
+      "type": "string",
+      "title": { "en": "Advice", "nl": "Advies" },
+      "example": { "en": "Fire it up", "nl": "Kolen aan, zorgen uit" }
+    },
+    {
+      "name": "score",
+      "type": "number",
+      "title": { "en": "Score", "nl": "Score" },
+      "example": 84
+    }
+  ]
+}

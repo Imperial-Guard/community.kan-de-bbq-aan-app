@@ -1,0 +1,13 @@
+{
+  "name": {
+    "en": "BBQ Score",
+    "nl": "BBQ-score"
+  },
+  "height": 260,
+  "transparent": true,
+  "api": {
+    "getStatus":   { "method": "GET", "path": "/status" },
+    "getForecast": { "method": "GET", "path": "/forecast" },
+    "getI18n":     { "method": "GET", "path": "/i18n" }
+  }
+}

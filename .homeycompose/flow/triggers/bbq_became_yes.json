@@ -1,0 +1,25 @@
+{
+  "title": {
+    "en": "It's BBQ weather",
+    "nl": "Het is BBQ-weer"
+  },
+  "hint": {
+    "en": "Fires once when today's verdict turns into YES.",
+    "nl": "Start één keer wanneer het verdict van vandaag op JA komt."
+  },
+  "highlight": true,
+  "tokens": [
+    {
+      "name": "advice",
+      "type": "string",
+      "title": { "en": "Advice", "nl": "Advies" },
+      "example": { "en": "Fire it up", "nl": "Kolen aan, zorgen uit" }
+    },
+    {
+      "name": "score",
+      "type": "number",
+      "title": { "en": "Score", "nl": "Score" },
+      "example": 84
+    }
+  ]
+}

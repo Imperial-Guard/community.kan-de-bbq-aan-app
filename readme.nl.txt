@@ -1,0 +1,1 @@
+Een ludieke Homey-app met een knipoog voor elke buitenkok: één blik op je dashboard vertelt of het vanavond tijd is om de kolen aan te steken. Geen weerbericht lezen, geen tweede app openen — gewoon een helder JA, TWIJFEL of NEE voor vandaag én de komende week. Weersdata geleverd door Open-Meteo.

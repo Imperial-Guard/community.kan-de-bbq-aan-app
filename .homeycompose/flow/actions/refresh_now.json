@@ -1,0 +1,10 @@
+{
+  "title": {
+    "en": "Refresh BBQ data",
+    "nl": "Ververs BBQ-data"
+  },
+  "hint": {
+    "en": "Forces a fresh fetch from the weather service.",
+    "nl": "Forceert een verse ophaal bij de weerdienst."
+  }
+}

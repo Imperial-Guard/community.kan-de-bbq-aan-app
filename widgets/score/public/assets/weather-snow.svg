@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none">
+  <g id="weather-snow" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M78 142
+             H222
+             C240 142 254 128 254 110
+             C254 93 241 79 224 78
+             C217 55 196 40 172 40
+             C151 40 132 52 123 70
+             C116 65 107 62 98 62
+             C79 62 64 77 64 96
+             C64 100 65 104 66 108
+             C53 113 44 126 44 140
+             C44 159 59 174 78 174
+             H218"/>
+
+    <g id="snowflake-left-small" stroke-width="5">
+      <path d="M100 198 V222"/>
+      <path d="M88 210 H112"/>
+      <path d="M92 202 L108 218"/>
+      <path d="M108 202 L92 218"/>
+    </g>
+
+    <g id="snowflake-center-left" stroke-width="6">
+      <path d="M135 210 V244"/>
+      <path d="M118 227 H152"/>
+      <path d="M123 215 L147 239"/>
+      <path d="M147 215 L123 239"/>
+    </g>
+
+    <g id="snowflake-center-right" stroke-width="6">
+      <path d="M180 210 V244"/>
+      <path d="M163 227 H197"/>
+      <path d="M168 215 L192 239"/>
+      <path d="M192 215 L168 239"/>
+    </g>
+
+    <g id="snowflake-right-small" stroke-width="5">
+      <path d="M218 198 V222"/>
+      <path d="M206 210 H230"/>
+      <path d="M210 202 L226 218"/>
+      <path d="M226 202 L210 218"/>
+    </g>
+
+    <circle cx="110" cy="262" r="3" fill="#2B2B2B" stroke="none"/>
+    <circle cx="159" cy="262" r="3" fill="#2B2B2B" stroke="none"/>
+    <circle cx="208" cy="262" r="3" fill="#2B2B2B" stroke="none"/>
+  </g>
+</svg>

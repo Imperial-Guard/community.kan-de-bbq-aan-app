@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none">
+  <g id="weather-storm" stroke="#2B2B2B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M78 142
+             H222
+             C240 142 254 128 254 110
+             C254 93 241 79 224 78
+             C217 55 196 40 172 40
+             C151 40 132 52 123 70
+             C116 65 107 62 98 62
+             C79 62 64 77 64 96
+             C64 100 65 104 66 108
+             C53 113 44 126 44 140
+             C44 159 59 174 78 174
+             H218"/>
+  </g>
+
+  <g id="storm-bolt" stroke="#EE6B39" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M158 180
+             L126 226
+             H155
+             L139 266
+             L184 211
+             H155
+             Z"/>
+  </g>
+</svg>

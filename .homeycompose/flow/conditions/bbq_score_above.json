@@ -1,0 +1,20 @@
+{
+  "title": {
+    "en": "BBQ score is !{{higher|lower}} than",
+    "nl": "BBQ-score is !{{hoger|lager}} dan"
+  },
+  "titleFormatted": {
+    "en": "BBQ score is !{{higher|lower}} than [[score]]",
+    "nl": "BBQ-score is !{{hoger|lager}} dan [[score]]"
+  },
+  "args": [
+    {
+      "name": "score",
+      "type": "number",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "placeholder": { "en": "Score", "nl": "Score" }
+    }
+  ]
+}

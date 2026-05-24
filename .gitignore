@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+*.log
+/env.json
+/.homeybuild/
+/_stale_homeybuild*/
+/icon-preview.png
