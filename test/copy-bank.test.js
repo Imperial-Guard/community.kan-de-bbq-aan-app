@@ -15,12 +15,12 @@ const sampleBank = {
   no:    { summer: ['N1'], spring: ['NS'], autumn: ['NF'], winter: ['NW'] },
 };
 
-test('currentSeason returnt valid season string', () => {
+test('currentSeason returns a valid season string', () => {
   const s = currentSeason();
   assert.ok(['spring', 'summer', 'autumn', 'winter'].includes(s));
 });
 
-test('pickAdvice returnt string + index uit de juiste status/season bucket', () => {
+test('pickAdvice returns an advice and index from the right status/season bucket', () => {
   const { advice, index } = pickAdvice('yes', sampleBank, -1);
   const season = currentSeason();
   const bucket = sampleBank.yes[season];
@@ -33,28 +33,28 @@ test('pickAdvice returnt string + index uit de juiste status/season bucket', () 
   }
 });
 
-test('pickAdvice met lege bucket returnt empty + -1', () => {
+test('pickAdvice with an empty bucket returns empty string and -1', () => {
   const empty = { yes: { summer: [], spring: [], autumn: [], winter: [] } };
   const { advice, index } = pickAdvice('yes', empty, -1);
   assert.equal(advice, '');
   assert.equal(index, -1);
 });
 
-test('pickAdvice met ontbrekende status returnt empty + -1', () => {
+test('pickAdvice with an unknown status returns empty string and -1', () => {
   const { advice, index } = pickAdvice('unknown', sampleBank, -1);
   assert.equal(advice, '');
   assert.equal(index, -1);
 });
 
-test('pickAdvice met enkele item bucket retourneert dat item (zonder loop)', () => {
+test('pickAdvice with a single-item bucket returns that item without looping', () => {
   const single = { yes: { summer: ['ONLY'], spring: ['ONLY'], autumn: ['ONLY'], winter: ['ONLY'] } };
   const { advice, index } = pickAdvice('yes', single, -1);
   assert.equal(advice, 'ONLY');
   assert.equal(index, 0);
 });
 
-// Bouw een test-bank waar de current-season bucket >1 items heeft, ongeacht datum.
-// Dit maakt de test seizoen-onafhankelijk.
+// Builds a bank where the current-season bucket has more than one item,
+// regardless of the calendar date. This keeps the test season-independent.
 function bankWithMultiItemSeason() {
   const seasons = ['spring', 'summer', 'autumn', 'winter'];
   const yes = {};
@@ -62,12 +62,12 @@ function bankWithMultiItemSeason() {
   return { yes };
 }
 
-test('pickAdvice probeert lastIndex te skippen wanneer bucket >1 items heeft', () => {
+test('pickAdvice tries to skip lastIndex when the bucket has more than one item', () => {
   const bank = bankWithMultiItemSeason();
   let sawDifferent = false;
   for (let i = 0; i < 100; i++) {
     const { index } = pickAdvice('yes', bank, 0);
     if (index !== 0) { sawDifferent = true; break; }
   }
-  assert.ok(sawDifferent, 'pickAdvice should occasionally pick non-lastIndex');
+  assert.ok(sawDifferent, 'pickAdvice should occasionally pick a non-lastIndex value');
 });

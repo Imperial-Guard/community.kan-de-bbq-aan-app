@@ -4,10 +4,11 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { analyzeDay, analyzeWeek } = require('../lib/bbq-algorithm');
 
-// ============ Hulpfunctie: bouw een minimale Open-Meteo-respons ============
+// ============ Helper: build a minimal Open-Meteo response ============
 function buildWeather(targetDate, perHour) {
   // perHour: { temperature_2m, precipitation, wind_speed_10m, wind_gusts_10m, relative_humidity_2m, cloud_cover }
-  // We genereren 24 uur voor targetDate, allemaal dezelfde waarden tenzij anders
+  // Generates 24 hours of data for targetDate, using the same values for every
+  // hour unless explicitly overridden.
   const dateStr = targetDate.toISOString().slice(0, 10);
   const hourly = {
     time: [],
@@ -30,8 +31,8 @@ function buildWeather(targetDate, perHour) {
   return { hourly };
 }
 
-// ============ analyzeDay: verdict-drempels ============
-test('analyzeDay: perfect BBQ weather → yes met hoge score', () => {
+// ============ analyzeDay: verdict thresholds ============
+test('analyzeDay: perfect BBQ weather yields yes with a high score', () => {
   const w = buildWeather(new Date('2026-06-15'), {
     temperature_2m: 22,
     precipitation: 0,
@@ -42,14 +43,14 @@ test('analyzeDay: perfect BBQ weather → yes met hoge score', () => {
   });
   const r = analyzeDay(w, new Date('2026-06-15'));
   assert.equal(r.status, 'yes');
-  assert.ok(r.score >= 90, `expected ≥90, got ${r.score}`);
+  assert.ok(r.score >= 90, `expected >= 90, got ${r.score}`);
   assert.equal(r.knockOuts.tooCold, false);
   assert.equal(r.knockOuts.tooWet, false);
   assert.equal(r.knockOuts.tooWindy, false);
 });
 
-test('analyzeDay: borderline weer → maybe', () => {
-  // precipitation 0.3/h × 5 evening hours = 1.5mm sum (onder knockout threshold van 2mm)
+test('analyzeDay: borderline weather yields maybe', () => {
+  // precipitation 0.3/h * 5 evening hours = 1.5 mm total, below the 2 mm knockout threshold.
   const w = buildWeather(new Date('2026-04-15'), {
     temperature_2m: 13,
     precipitation: 0.3,
@@ -64,7 +65,7 @@ test('analyzeDay: borderline weer → maybe', () => {
   assert.ok(r.score >= 45 && r.score < 75, `expected 45-74, got ${r.score}`);
 });
 
-test('analyzeDay: slechte dag → no', () => {
+test('analyzeDay: bad day yields no', () => {
   const w = buildWeather(new Date('2026-11-15'), {
     temperature_2m: 6,
     precipitation: 3,
@@ -75,11 +76,11 @@ test('analyzeDay: slechte dag → no', () => {
   });
   const r = analyzeDay(w, new Date('2026-11-15'));
   assert.equal(r.status, 'no');
-  assert.ok(r.score < 45, `expected <45, got ${r.score}`);
+  assert.ok(r.score < 45, `expected < 45, got ${r.score}`);
 });
 
 // ============ Knockouts ============
-test('knockout tooCold: temp < 10 capt score op 40', () => {
+test('knockout tooCold: temp below 10 caps score at 40', () => {
   const w = buildWeather(new Date('2026-03-15'), {
     temperature_2m: 8,
     precipitation: 0,
@@ -87,21 +88,21 @@ test('knockout tooCold: temp < 10 capt score op 40', () => {
   });
   const r = analyzeDay(w, new Date('2026-03-15'));
   assert.equal(r.knockOuts.tooCold, true);
-  assert.ok(r.score <= 40, `expected ≤40, got ${r.score}`);
+  assert.ok(r.score <= 40, `expected <= 40, got ${r.score}`);
 });
 
-test('knockout tooWet: rain > 2mm capt score op 40', () => {
+test('knockout tooWet: rain above 2 mm caps score at 40', () => {
   const w = buildWeather(new Date('2026-06-15'), {
     temperature_2m: 22,
-    precipitation: 0.5, // 0.5 * 5 evening hours = 2.5mm sum → > 2
+    precipitation: 0.5, // 0.5 * 5 evening hours = 2.5 mm total, above the 2 mm threshold.
     wind_speed_10m: 5,
   });
   const r = analyzeDay(w, new Date('2026-06-15'));
   assert.equal(r.knockOuts.tooWet, true);
-  assert.ok(r.score <= 40, `expected ≤40, got ${r.score}`);
+  assert.ok(r.score <= 40, `expected <= 40, got ${r.score}`);
 });
 
-test('knockout tooWindy: gusts > 65 km/h capt score op 40', () => {
+test('knockout tooWindy: gusts above 65 km/h cap score at 40', () => {
   const w = buildWeather(new Date('2026-06-15'), {
     temperature_2m: 22,
     precipitation: 0,
@@ -109,11 +110,11 @@ test('knockout tooWindy: gusts > 65 km/h capt score op 40', () => {
   });
   const r = analyzeDay(w, new Date('2026-06-15'));
   assert.equal(r.knockOuts.tooWindy, true);
-  assert.ok(r.score <= 40, `expected ≤40, got ${r.score}`);
+  assert.ok(r.score <= 40, `expected <= 40, got ${r.score}`);
 });
 
-// ============ Score-soepelheid ============
-test('analyzeDay: temp 25° = peak van temp-curve (geen aftrek)', () => {
+// ============ Score smoothness ============
+test('analyzeDay: 25 degrees sits at the peak of the temperature curve', () => {
   const w25 = buildWeather(new Date('2026-06-15'), {
     temperature_2m: 25, precipitation: 0, wind_speed_10m: 5,
   });
@@ -122,11 +123,11 @@ test('analyzeDay: temp 25° = peak van temp-curve (geen aftrek)', () => {
   });
   const r25 = analyzeDay(w25, new Date('2026-06-15'));
   const r22 = analyzeDay(w22, new Date('2026-06-15'));
-  // Beide moeten 100 voor temp opleveren → score gelijk
+  // Both temperatures should map to tempScore 100, so the overall score is equal.
   assert.equal(r25.score, r22.score);
 });
 
-test('analyzeDay: hoge wind verlaagt score zelfs zonder knockout', () => {
+test('analyzeDay: higher wind lowers the score even without a knockout', () => {
   const calm = buildWeather(new Date('2026-06-15'), {
     temperature_2m: 22, precipitation: 0, wind_speed_10m: 5, wind_gusts_10m: 10,
   });
@@ -138,9 +139,9 @@ test('analyzeDay: hoge wind verlaagt score zelfs zonder knockout', () => {
   assert.ok(r2.score < r1.score, `breezy ${r2.score} should be < calm ${r1.score}`);
 });
 
-// ============ Randgevallen ============
-test('analyzeDay: geen evening data → null', () => {
-  // Build weather met alleen ochtend-uren
+// ============ Edge cases ============
+test('analyzeDay: returns null when no evening data is available', () => {
+  // Only morning hours present, so the evening window has nothing to analyse.
   const w = {
     hourly: {
       time: ['2026-06-15T05:00', '2026-06-15T08:00', '2026-06-15T10:00'],
@@ -156,8 +157,9 @@ test('analyzeDay: geen evening data → null', () => {
   assert.equal(r, null);
 });
 
-test('analyzeDay: alleen 17:00-21:00 worden geanalyseerd, niet midday', () => {
-  // Middag is extreem heet (35°), avond is 22°. Het algoritme moet de avond pakken, niet de middag.
+test('analyzeDay: only the 17:00-21:00 window is analysed, never midday', () => {
+  // Midday is extremely hot (35) and evening is 22. The algorithm should pick
+  // up the evening, not the midday.
   const dateStr = '2026-07-15';
   const hourly = {
     time: [], temperature_2m: [], precipitation: [], wind_speed_10m: [],
@@ -173,20 +175,20 @@ test('analyzeDay: alleen 17:00-21:00 worden geanalyseerd, niet midday', () => {
     hourly.cloud_cover.push(20);
   }
   const r = analyzeDay({ hourly }, new Date('2026-07-15'));
-  // Temp 22° is in de peak-zone (15-25°) → temp-score 100
+  // 22 degrees sits in the peak temperature zone (15-25), so tempScore is 100.
   assert.equal(r.status, 'yes');
   assert.ok(r.conditions.temperature >= 21 && r.conditions.temperature <= 23);
 });
 
 // ============ analyzeWeek ============
-test('analyzeWeek: returnt 7 dagen wanneer data beschikbaar', () => {
+test('analyzeWeek: returns 7 days when data is available', () => {
   const today = new Date();
   const todayStr = today.toISOString().slice(0, 10);
   const hourly = {
     time: [], temperature_2m: [], precipitation: [], wind_speed_10m: [],
     wind_gusts_10m: [], relative_humidity_2m: [], cloud_cover: [],
   };
-  // Genereer 7 dagen aan data, vanaf vandaag
+  // Generate seven days of data, starting from today.
   for (let day = 0; day < 7; day++) {
     const d = new Date(today);
     d.setDate(today.getDate() + day);
@@ -210,12 +212,11 @@ test('analyzeWeek: returnt 7 dagen wanneer data beschikbaar', () => {
   }
 });
 
-// ============ Score-bereik bewaken ============
-test('analyzeDay: score altijd in range 0-100', () => {
-  // Test diverse combinaties
+// ============ Score range guard ============
+test('analyzeDay: score is always within the 0-100 range', () => {
   const cases = [
     { temperature_2m: -5, precipitation: 5, wind_gusts_10m: 80 }, // worst case
-    { temperature_2m: 22, precipitation: 0, wind_speed_10m: 5 },   // best case
+    { temperature_2m: 22, precipitation: 0, wind_speed_10m: 5 },  // best case
     { temperature_2m: 40, precipitation: 1, wind_speed_10m: 30 }, // mixed
   ];
   for (const c of cases) {

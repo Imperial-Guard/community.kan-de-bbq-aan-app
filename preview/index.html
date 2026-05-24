@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BBQ widgets — preview</title>
+  <title>BBQ widgets - preview</title>
   <style>
     :root {
       --bg: #0F1114;
@@ -160,7 +160,7 @@
 </head>
 <body>
   <header>
-    <h1>🔥 BBQ widgets — preview</h1>
+    <h1>BBQ widgets - preview</h1>
     <span class="sub">Speel met de sliders of kies een scenario. Widgets rerenderen meteen.</span>
   </header>
 
@@ -169,14 +169,14 @@
       <div class="section">
         <div class="section-title">Scenario</div>
         <div class="scenarios" id="scenarios">
-          <button data-scenario="summer">☀️ Mooie zomerdag</button>
-          <button data-scenario="spring">🌤 Voorjaar</button>
-          <button data-scenario="iffy">🌥 Twijfel</button>
-          <button data-scenario="storm">🌬 Najaarsstorm</button>
-          <button data-scenario="rain">🌧 Natte dag</button>
-          <button data-scenario="winter">❄️ Koude winter</button>
-          <button data-scenario="edge">🧪 Randgeval</button>
-          <button data-scenario="peak">🔥 Perfect</button>
+          <button data-scenario="summer">Summer day</button>
+          <button data-scenario="spring">Spring</button>
+          <button data-scenario="iffy">Borderline</button>
+          <button data-scenario="storm">Autumn storm</button>
+          <button data-scenario="rain">Wet day</button>
+          <button data-scenario="winter">Cold winter</button>
+          <button data-scenario="edge">Edge case</button>
+          <button data-scenario="peak">Perfect</button>
         </div>
       </div>
 
@@ -239,11 +239,11 @@
       <div class="section">
         <div class="section-title">Berekend</div>
         <div class="computed" id="computed">
-          <span class="k">Score</span>         <span class="v" id="cScore">—</span>
-          <span class="k">Status</span>        <span class="v" id="cStatus">—</span>
-          <span class="k">Knock-outs</span>    <span class="v" id="cKO">—</span>
-          <span class="k">Seizoen</span>       <span class="v" id="cSeason">—</span>
-          <span class="k">Advies</span>        <span class="v" id="cAdvice">—</span>
+          <span class="k">Score</span>         <span class="v" id="cScore">-</span>
+          <span class="k">Status</span>        <span class="v" id="cStatus">-</span>
+          <span class="k">Knockouts</span>     <span class="v" id="cKO">-</span>
+          <span class="k">Season</span>        <span class="v" id="cSeason">-</span>
+          <span class="k">Advice</span>        <span class="v" id="cAdvice">-</span>
         </div>
       </div>
     </aside>
@@ -259,7 +259,7 @@
           <iframe id="fScore" data-widget="score" data-src="/widgets/score/public/index.html" style="height: 220px;"></iframe>
         </div>
         <div class="widget-card wide">
-          <h3>Forecast <span class="dim">140px — 7 dagen</span></h3>
+          <h3>Forecast <span class="dim">140px, 7 days</span></h3>
           <iframe id="fForecast" data-widget="forecast" data-src="/widgets/forecast/public/index.html" style="height: 140px;"></iframe>
         </div>
       </div>
@@ -368,7 +368,7 @@
     function makeMockHomey(iframe, state) {
       const widget = iframe.dataset.widget;
       return {
-        ready(opts) { /* no-op — iframe height is fixed from harness */ },
+        ready(opts) { /* no-op; the iframe height is fixed by the harness */ },
         getSettings() { return { show_details: state.details }; },
         getLanguage() { return state.lang; },
         async api(method, path) {

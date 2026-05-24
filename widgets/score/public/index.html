@@ -34,7 +34,7 @@
     body.maybe { --card-bg: linear-gradient(135deg, #FFF4D1 0%, #FFE29F 55%, #F5C061 100%); --fg: #5C3D05; --fg-muted: rgba(92, 61, 5, 0.72); --border: rgba(92, 61, 5, 0.22); }
     body.no    { --card-bg: linear-gradient(135deg, #F8D5CD 0%, #E89B8B 55%, #C4624F 100%); --fg: #5A1E0E; --fg-muted: rgba(90, 30, 14, 0.72); --border: rgba(90, 30, 14, 0.22); }
 
-    /* ============ TOP ROW: scene · info · chip ============ */
+    /* ============ Top row: scene, info, chip ============ */
     .top {
       display: grid;
       grid-template-columns: 124px 1fr auto;
@@ -42,7 +42,7 @@
       align-items: center;
     }
 
-    /* ===== Layered scene: weather glyph (top-left) + kettle (base) + flame (over grate) ===== */
+    /* ===== Layered scene: weather glyph (top-left), kettle (base), flame (over grate). ===== */
     .scene {
       position: relative;
       width: 124px;
@@ -67,7 +67,7 @@
       opacity: 0.95;
       transition: opacity 0.4s ease;
     }
-    /* Outer wrapper handelt score-gedreven base-scale af; inner img doet de flicker animatie */
+    /* Outer wrapper handles the score-driven base scale; the inner img runs the flicker animation. */
     .scene .flame-wrap {
       position: absolute;
       top: 14%;
@@ -159,7 +159,7 @@
       color: rgba(255,255,255,0.85);
     }
 
-    /* ============ WEATHER LINE ============ */
+    /* ============ Weather line ============ */
     .weather-line {
       padding-top: 6px;
       border-top: 1px solid var(--border);
@@ -175,7 +175,7 @@
       margin: 0 6px;
     }
 
-    /* ============ 3-DAY MINI FORECAST ============ */
+    /* ============ Three-day mini forecast ============ */
     .upcoming {
       display: flex;
       flex-direction: column;
@@ -238,7 +238,7 @@
     .fcell.maybe { background: linear-gradient(175deg, #FFD54F 0%, #F5A623 100%); color: #5A3D00; }
     .fcell.no    { background: linear-gradient(175deg, #E89B8B 0%, #A03818 100%); }
 
-    /* Mini-BBQ silhouet links in elke pill. Visueel consistent met de Forecast-widget. */
+    /* Mini BBQ silhouette on the left of each pill, visually consistent with the Forecast widget. */
     .fcell .fbbq {
       width: 22px;
       height: 22px;
@@ -288,10 +288,10 @@
   </div>
 
   <script>
-    // ============ Weer-glyph kiezer (kijkt naar status) ============
-    // Een ja-dag toont standaard de zon, tenzij het echt overcast is.
-    // Open-Meteo's cloudCover is vaak hoog door hoge cirrus, dus we
-    // hanteren een strengere drempel.
+    // ============ Weather-glyph picker (status-aware) ============
+    // On a yes-day default to sunny unless the sky is truly overcast.
+    // Open-Meteo's cloudCover is often high because of high cirrus, so
+    // the cloud threshold is intentionally strict.
     function pickWeather(d) {
       const rain   = d.rain       ?? 0;
       const wind   = d.windSpeed  ?? 0;
@@ -310,7 +310,7 @@
       return 'sunny';
     }
 
-    // ============ Score naar chip-kleurbucket ============
+    // ============ Score to chip-colour bucket ============
     function scoreBucket(score) {
       if (score == null) return 'chip-warm';
       if (score >= 70)  return 'chip-hot';
@@ -318,7 +318,7 @@
       return 'chip-cool';
     }
 
-    // ============ Buckets voor weer-tekstregel ============
+    // ============ Buckets for the weather text line ============
     function windKey(kmh) {
       if (kmh == null) return null;
       if (kmh < 12) return 'light';
@@ -335,7 +335,7 @@
       if (mm < 2)    return 'showerExpected';
       return 'heavyRain';
     }
-    // Geeft DOM-nodes terug zodat replaceChildren() ze veilig kan invoegen.
+    // Returns DOM nodes ready for safe insertion via replaceChildren().
     function buildWeatherNodes(data, L) {
       const parts = [];
       if (data.temperature != null) parts.push(Math.round(data.temperature) + '°');
@@ -355,7 +355,7 @@
       return nodes;
     }
 
-    // ============ Hoofdfunctie ============
+    // ============ Main ============
     function onHomeyReady(Homey) {
       Homey.ready({ height: 260 });
       let L = null;
@@ -385,7 +385,7 @@
             const s = d.status || 'maybe';
             document.body.className = 'homey-widget ' + s;
 
-            // Wissel de weer-glyph (zon, wolk, regen, storm, wind, sneeuw).
+            // Swap the weather glyph (sunny, cloudy, rain, storm, wind, snow).
             const wk = pickWeather(d);
             const nextSrc = 'assets/weather-' + wk + '.svg';
             if (!weatherImg.src.endsWith(nextSrc)) weatherImg.src = nextSrc;
@@ -394,7 +394,7 @@
             document.getElementById('num').textContent = score;
             document.getElementById('status').textContent = L.labels[s] || '—';
 
-            // De vlam schaalt mee met de score, in een bereik van 0.5 tot 1.1.
+            // Flame scales with the score, mapped to a range of 0.5 to 1.1.
             const flameScale = (0.5 + (score / 100) * 0.6).toFixed(2);
             document.documentElement.style.setProperty('--flame-scale', flameScale);
 
@@ -406,7 +406,7 @@
           }
 
           if (f && f.days) {
-            // Vandaag overslaan (index 0), de volgende 3 dagen tonen.
+            // Skip today (index 0) and show the next three days.
             const upcoming = f.days.slice(1, 4);
             const row = document.getElementById('forecastRow');
             row.replaceChildren();
@@ -444,7 +444,7 @@
         finally { refreshing = false; }
       }
       refresh();
-      // Lifecycle: interval-id bewaren en stoppen bij iframe-unload.
+      // Lifecycle: keep the interval id and clear it on iframe unload.
       const refreshTimer = setInterval(refresh, 5 * 60 * 1000);
       const cleanup = () => clearInterval(refreshTimer);
       window.addEventListener('pagehide', cleanup);

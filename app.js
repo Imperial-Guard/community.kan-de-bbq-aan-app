@@ -5,7 +5,7 @@ const { fetchWeather } = require('./lib/open-meteo');
 const { analyzeDay, analyzeWeek } = require('./lib/bbq-algorithm');
 const { pickAdvice } = require('./lib/copy-bank');
 
-// Eén bron van waarheid voor alle strings buiten compose.
+// Locale bundles for runtime strings. The compose-managed strings live in .homeycompose/.
 const STRINGS = {
   nl: require('./locales/nl.json'),
   en: require('./locales/en.json'),
@@ -17,7 +17,7 @@ const MIN_REFRESH_AGE_MS = 5 * 60 * 1000;
 class KanDeBbqAanApp extends Homey.App {
 
   async onInit() {
-    this.log('Kan de BBQ aan? app geïnitialiseerd');
+    this.log('Kan de BBQ aan? app initialized');
 
     this._weatherCache = null;
     this._weatherFetchedAt = 0;
@@ -70,15 +70,15 @@ class KanDeBbqAanApp extends Homey.App {
       const lon = (await this.homey.geolocation.getLongitude()) ?? 5.2913;
       if (!Number.isFinite(lat) || !Number.isFinite(lon)
           || (lat === 52.1326 && lon === 5.2913)) {
-        this.log('LET OP: terugval op geografisch middelpunt van NL voor locatie');
+        this.log('WARN: using NL geographic centre fallback for geolocation');
       }
       try {
         weather = await fetchWeather(lat, lon);
         this._weatherCache = weather;
         this._weatherFetchedAt = now;
       } catch (err) {
-        this.error('Ophalen van weerdata mislukt:', err);
-        // Bij fout terugvallen op de gecachte data als die bestaat, anders afbreken.
+        this.error('Weather fetch failed:', err);
+        // Fall back to the stale cache if available; otherwise abort this update.
         if (!this._weatherCache) return;
         weather = this._weatherCache;
       }
@@ -86,12 +86,12 @@ class KanDeBbqAanApp extends Homey.App {
 
     const today = analyzeDay(weather, new Date());
     if (!today) {
-      this.error('Geen weerdata beschikbaar voor vandaag');
+      this.error('No weather data for today');
       return;
     }
     this._forecast = analyzeWeek(weather);
 
-    // Volgt de Homey-apparaattaal: NL-toestel krijgt NL copy, anders EN.
+    // Follow the Homey device language: NL device gets NL copy, otherwise EN.
     const strings = this.getStrings();
     const { advice, index } = pickAdvice(today.status, strings.advice, this._lastCopyIndex);
     this._lastCopyIndex = index;
@@ -133,7 +133,7 @@ class KanDeBbqAanApp extends Homey.App {
   }
 
   /**
-   * Geeft de huidige locale-code terug op basis van de Homey device-taal.
+   * Returns the locale code matching the Homey device language.
    * @returns {'nl'|'en'}
    */
   getLocale() {
@@ -141,9 +141,9 @@ class KanDeBbqAanApp extends Homey.App {
   }
 
   /**
-   * Geeft het volledige string-bundel voor de huidige locale terug.
-   * Widgets krijgen alleen hun eigen subtree via de /i18n endpoint per widget.
-   * @returns {object} ingelezen locales/{lang}.json
+   * Returns the full string bundle for the current locale. Widgets receive
+   * only their own subtree via the per-widget /i18n endpoint.
+   * @returns {object} parsed locales/{lang}.json
    */
   getStrings() {
     return STRINGS[this.getLocale()];

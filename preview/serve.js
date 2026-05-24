@@ -2,13 +2,13 @@
 'use strict';
 
 /**
- * Lokale preview-server voor de drie BBQ-widgets.
+ * Local preview server for the three BBQ widgets.
  *
  *   node preview/serve.js
- *   -> http://localhost:3100/
+ *   http://localhost:3100/
  *
- * Serveert de preview-harness, de echte widget-HTML's en de locales-JSON.
- * Gebruikt alleen Node built-ins, geen externe dependencies.
+ * Serves the preview harness, the actual widget HTML files and the locale JSON.
+ * Uses only Node built-ins, no external dependencies.
  */
 
 const http = require('http');
@@ -30,14 +30,14 @@ const MIME = {
 };
 
 function resolveFile(urlPath) {
-  // Bestanden van de preview-harness zelf.
+  // Files belonging to the preview harness itself.
   if (urlPath === '/' || urlPath === '/index.html') {
     return path.join(PREVIEW_DIR, 'index.html');
   }
-  // Al het overige relatief tot de project-root (widgets, locales, assets).
+  // Everything else is resolved relative to the project root (widgets, locales, assets).
   const clean = urlPath.replace(/^\/+/, '');
   const abs = path.resolve(PROJECT_ROOT, clean);
-  // Beveiliging tegen path traversal.
+  // Guard against path traversal.
   if (!abs.startsWith(PROJECT_ROOT)) return null;
   return abs;
 }
@@ -72,6 +72,6 @@ server.listen(PORT, () => {
   console.log('');
   console.log('  \x1b[1;33mBBQ widgets preview\x1b[0m');
   console.log('  \u2192 \x1b[36mhttp://localhost:' + PORT + '/\x1b[0m');
-  console.log('  Ctrl+C om te stoppen');
+  console.log('  Ctrl+C to stop');
   console.log('');
 });

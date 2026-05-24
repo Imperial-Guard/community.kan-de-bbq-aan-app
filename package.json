@@ -1,7 +1,7 @@
 {
   "name": "nl.bbqaan.app",
   "version": "1.0.0",
-  "description": "Kan de BBQ aan? — a Homey app",
+  "description": "Kan de BBQ aan? - a Homey app",
   "main": "app.js",
   "engines": {
     "node": ">=22"

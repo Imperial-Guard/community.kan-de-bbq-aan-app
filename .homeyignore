@@ -1,4 +1,4 @@
-# Bestanden alleen voor development. Worden niet meegeleverd aan gebruikers.
+# Development-only files. Not shipped to end users.
 /preview/
 /docs/
 /test/

@@ -1,9 +1,9 @@
-// Genereert de widget-preview-PNG's opnieuw vanuit de actuele widget-HTML.
-// Aanpak: een in-process static fileserver per widget-folder, een headless
-// Chromium die screenshots maakt voor zowel light als dark, weggeschreven
-// naar widgets/<id>/preview-{light,dark}.png.
+// Regenerates the widget preview PNGs from the current widget HTML.
+// Approach: an in-process static file server per widget folder, a headless
+// Chromium that screenshots both light and dark variants, written out to
+// widgets/<id>/preview-{light,dark}.png.
 //
-// Gebruik:  node scripts/generate-previews.mjs
+// Usage: node scripts/generate-previews.mjs
 
 import http from 'node:http';
 import fs from 'node:fs/promises';
@@ -14,10 +14,9 @@ import puppeteer from 'puppeteer';
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
-// Configuratie per widget. De breedte is een gangbare kaartbreedte op een
-// Homey-dashboard, de hoogte komt overeen met widget.compose.json. De PNG
-// wordt op 3x DPR gerenderd voor scherpe Retina-weergave en daarna door
-// Homey op zijn eigen formaat getoond.
+// Per-widget config. Width is a typical card width on a Homey dashboard,
+// height matches widget.compose.json. The final PNG is rendered at 3x DPR
+// for crisp Retina display, then served to Homey at its native size.
 const WIDGETS = [
   { id: 'verdict',  width: 480, height: 220 },
   { id: 'score',    width: 480, height: 260 },
@@ -29,12 +28,12 @@ const THEMES = [
   { name: 'dark',  bg: '#1B1B1B', textColor: '#F5F5F5' },
 ];
 
-// Een mock Homey-runtime die de widget-HTML verwacht. Levert geloofwaardige
-// data zodat de gelaagde scene in een "ja"-staat rendert.
+// Mock Homey runtime that the widget HTML expects to be present. Returns
+// plausible data so the layered scene renders in a "yes" state.
 const MOCK_HOMEY_SCRIPT = `
 <script>
-  // Mock van het Homey-API-oppervlak. Bootst het Homey-object na dat normaal
-  // door het iframe wordt ingespoten. De widget-HTML roept onHomeyReady(Homey) aan.
+  // Mock of the Homey API surface. Mirrors the Homey object that is normally
+  // injected by the iframe host. The widget HTML calls onHomeyReady(Homey).
   window.Homey = {
     ready: () => {},
     getSettings: () => ({ show_details: true }),
@@ -84,8 +83,8 @@ const MOCK_HOMEY_SCRIPT = `
       return null;
     },
   };
-  // Brug: widgets verwachten dat Homey onHomeyReady(Homey) aanroept. We
-  // doen het na een microtask zodat het script van de pagina eerst draait.
+  // Bridge: widgets expect Homey to call onHomeyReady(Homey). We do it after
+  // a microtask so the page's own script runs first.
   Promise.resolve().then(() => {
     if (typeof onHomeyReady === 'function') onHomeyReady(window.Homey);
   });
@@ -101,7 +100,7 @@ function makeServer(widgetDir) {
       let type = 'application/octet-stream';
       if (filePath.endsWith('.html')) {
         type = 'text/html';
-        // Inject mock-Homey just before </body> of index.html
+        // Inject the mock Homey runtime just before </body>.
         let html = body.toString('utf8');
         html = html.replace('</body>', MOCK_HOMEY_SCRIPT + '</body>');
         body = Buffer.from(html, 'utf8');
@@ -134,20 +133,20 @@ async function captureWidget(widget) {
       const page = await browser.newPage();
       await page.setViewport({ width: widget.width, height: widget.height, deviceScaleFactor: 3 });
       await page.goto(baseUrl, { waitUntil: 'networkidle2' });
-      // Thema toepassen: de dashboard-achtergrond komt op <html>, de tekstkleur
-      // van Homey komt als CSS-variabele op de root. We laten document.body.background
-      // bewust met rust: widgets met een eigen status-gradient (verdict / score)
-      // behouden die, en widgets met een transparante achtergrond (forecast)
-      // tonen de dashboard-kleur erdoorheen.
+      // Apply the theme: dashboard background goes on <html>, Homey's text-color
+      // is set as a CSS variable on the root. We do not touch document.body.background
+      // so widgets with their own status gradient (verdict, score) keep it,
+      // and widgets with a transparent body (forecast) show the dashboard
+      // colour through.
       await page.evaluate((bg, fg) => {
         document.documentElement.style.setProperty('--homey-text-color', fg);
         document.documentElement.style.background = bg;
       }, theme.bg, theme.textColor);
-      // Give CSS transitions + image loads a moment
+      // Allow CSS transitions and image loads to settle.
       await new Promise(r => setTimeout(r, 800));
       const outPath = path.join(widgetDir, `preview-${theme.name}.png`);
       await page.screenshot({ path: outPath, type: 'png', omitBackground: false });
-      console.log(`  ✓ ${path.relative(ROOT, outPath)}`);
+      console.log(`  written: ${path.relative(ROOT, outPath)}`);
       await page.close();
     }
   } finally {

@@ -9,8 +9,8 @@
       margin: 0;
       font-family: var(--homey-font-family-regular, -apple-system, BlinkMacSystemFont, sans-serif);
       overflow: hidden;
-      /* Transparant. De pills zweven op de dashboard-achtergrond van Homey
-         zelf, dus passen automatisch bij licht of donker thema. */
+      /* Transparent. The pills sit on the Homey dashboard background itself,
+         so they adapt automatically to light or dark theme. */
       background: transparent;
       color: var(--homey-text-color, #1B1B1B);
     }
@@ -33,7 +33,7 @@
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      /* Gebruikt Homey's text-color die mee adapteert met thema */
+      /* Use Homey's text-color CSS variable so the label adapts with the theme. */
       color: var(--homey-text-color, #1B1B1B);
       opacity: 0.72;
       line-height: 1;
@@ -42,7 +42,7 @@
       color: #D85A30;
       opacity: 1;
     }
-    /* OS-fallback wanneer Homey-variabele ontbreekt */
+    /* OS fallback when the Homey CSS variable is not available. */
     @media (prefers-color-scheme: dark) {
       .dow { color: var(--homey-text-color, #F5F5F5); }
     }
@@ -77,7 +77,7 @@
       pointer-events: none;
     }
 
-    /* Traffic-light per dag: groen = doe het, amber = twijfel, rood = niet doen */
+    /* Traffic-light per day: green is go, amber is maybe, red is no. */
     .cell.yes   { --bg: linear-gradient(175deg, #9ED066 0%, #3E8B0F 100%); color: #FFFFFF; }
     .cell.maybe { --bg: linear-gradient(175deg, #FFD54F 0%, #F5A623 100%); color: #5A3D00; }
     .cell.no    { --bg: linear-gradient(175deg, #E89B8B 0%, #A03818 100%); color: #FFFFFF; }
@@ -86,7 +86,7 @@
       box-shadow: 0 0 0 2px #D85A30, 0 2px 10px rgba(216, 90, 48, 0.55);
     }
 
-    /* ============ Mini BBQ silhouet per day-pill ============ */
+    /* ============ Mini BBQ silhouette per day-pill ============ */
     .icon {
       position: relative;
       width: 48px;
@@ -101,8 +101,8 @@
       user-select: none;
       pointer-events: none;
     }
-    /* Sterk gevulde silhouet. Leest op klein formaat beter dan een outline-tekening.
-       Op groen en rood wordt de BBQ wit voor contrast; op amber blijft hij donker. */
+    /* A solid filled silhouette reads better at small sizes than a line drawing.
+       On green and red the BBQ is inverted to white for contrast; on amber it stays dark. */
     .cell.yes .icon .ikettle,
     .cell.no  .icon .ikettle {
       filter: brightness(0) invert(1);
@@ -182,9 +182,9 @@
       }
 
       refresh();
-      // Lifecycle: in Homey SDK v3 is geen gedocumenteerde teardown-hook voor
-      // widgets. We bewaren het interval-id en stoppen het bij iframe-unload,
-      // zodat opnieuw mounten van het widget niet zorgt dat timers zich opstapelen.
+      // Lifecycle: SDK v3 has no documented widget teardown hook. We keep the
+      // interval id and clear it on iframe unload, so a dashboard remount of
+      // the widget does not stack timers.
       const refreshTimer = setInterval(refresh, 5 * 60 * 1000);
       const cleanup = () => clearInterval(refreshTimer);
       window.addEventListener('pagehide', cleanup);
