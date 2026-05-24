@@ -66,8 +66,12 @@ class KanDeBbqAanApp extends Homey.App {
 
     let weather = this._weatherCache;
     if (!weather || age > POLL_INTERVAL_MS || (force && age > MIN_REFRESH_AGE_MS)) {
-      const lat = this.homey.geolocation.getLatitude() ?? 52.1326;
-      const lon = this.homey.geolocation.getLongitude() ?? 5.2913;
+      const lat = (await this.homey.geolocation.getLatitude()) ?? 52.1326;
+      const lon = (await this.homey.geolocation.getLongitude()) ?? 5.2913;
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)
+          || (lat === 52.1326 && lon === 5.2913)) {
+        this.log('WARN: using NL geographic centre fallback for geolocation');
+      }
       try {
         weather = await fetchWeather(lat, lon);
         this._weatherCache = weather;
