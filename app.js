@@ -47,9 +47,9 @@ class KanDeBbqAanApp extends Homey.App {
         await this._update(true);
       });
 
-    await this._update().catch(this.error);
+    await this._update().catch((err) => this.error(err));
     this._pollInterval = this.homey.setInterval(
-      () => this._update().catch(this.error),
+      () => this._update().catch((err) => this.error(err)),
       POLL_INTERVAL_MS
     );
   }
@@ -113,13 +113,13 @@ class KanDeBbqAanApp extends Homey.App {
         status: today.status,
         advice,
         score: today.score,
-      }).catch(this.error);
+      }).catch((err) => this.error(err));
 
       if (previousStatus !== 'yes' && today.status === 'yes') {
         await this._triggerBecameYes.trigger({
           advice,
           score: today.score,
-        }).catch(this.error);
+        }).catch((err) => this.error(err));
       }
     }
   }
