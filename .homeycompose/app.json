@@ -28,5 +28,9 @@
     "name": "Paul Vermeulen",
     "email": "33509000+Imperial-Guard@users.noreply.github.com"
   },
-  "support": "mailto:33509000+Imperial-Guard@users.noreply.github.com"
+  "support": "https://github.com/Imperial-Guard/community.kan-de-bbq-aan-app/issues",
+  "source": "https://github.com/Imperial-Guard/community.kan-de-bbq-aan-app",
+  "bugs": {
+    "url": "https://github.com/Imperial-Guard/community.kan-de-bbq-aan-app/issues"
+  }
 }
