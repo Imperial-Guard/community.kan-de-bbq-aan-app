@@ -119,10 +119,23 @@
       font-variant-numeric: tabular-nums;
       text-shadow: 0 1px 1px rgba(0,0,0,0.1);
     }
+
+    /* CC BY 4.0 attribution voor Open-Meteo — subtiel in de hoek */
+    .attrib {
+      position: absolute;
+      right: 8px;
+      bottom: 2px;
+      font-size: 9px;
+      opacity: 0.45;
+      color: var(--homey-text-color, #1B1B1B);
+      letter-spacing: 0.02em;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body class="homey-widget-small">
   <div class="grid" id="grid"></div>
+  <div class="attrib">data: open-meteo.com</div>
 
   <script>
     function onHomeyReady(Homey) {
