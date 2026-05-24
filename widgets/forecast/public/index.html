@@ -128,8 +128,11 @@
     function onHomeyReady(Homey) {
       Homey.ready({ height: 140 });
       let L = null;
+      let refreshing = false;
 
       async function refresh() {
+        if (refreshing) return;
+        refreshing = true;
         try {
           if (!L) L = await Homey.api('GET', '/i18n');
           if (!L) return;
@@ -158,10 +161,17 @@
             grid.appendChild(el);
           }
         } catch (e) { console.error(e); }
+        finally { refreshing = false; }
       }
 
       refresh();
-      setInterval(refresh, 5 * 60 * 1000);
+      // Lifecycle: Homey SDK v3 has no documented widget teardown hook.
+      // We capture the interval id and clear it on iframe unload to prevent
+      // stacking if the dashboard re-mounts the widget.
+      const refreshTimer = setInterval(refresh, 5 * 60 * 1000);
+      const cleanup = () => clearInterval(refreshTimer);
+      window.addEventListener('pagehide', cleanup);
+      window.addEventListener('beforeunload', cleanup);
     }
   </script>
 </body>

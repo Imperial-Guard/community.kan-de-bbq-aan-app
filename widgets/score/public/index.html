@@ -347,9 +347,12 @@
     function onHomeyReady(Homey) {
       Homey.ready({ height: 260 });
       let L = null;
+      let refreshing = false;
       const weatherImg = document.getElementById('weatherImg');
 
       async function refresh() {
+        if (refreshing) return;
+        refreshing = true;
         try {
           if (!L) {
             L = await Homey.api('GET', '/i18n');
@@ -408,9 +411,14 @@
             }
           }
         } catch (e) { console.error(e); }
+        finally { refreshing = false; }
       }
       refresh();
-      setInterval(refresh, 5 * 60 * 1000);
+      // Lifecycle: capture interval id and clear on iframe unload.
+      const refreshTimer = setInterval(refresh, 5 * 60 * 1000);
+      const cleanup = () => clearInterval(refreshTimer);
+      window.addEventListener('pagehide', cleanup);
+      window.addEventListener('beforeunload', cleanup);
     }
   </script>
 </body>
