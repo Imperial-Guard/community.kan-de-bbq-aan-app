@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { analyzeDay, analyzeWeek } = require('../lib/bbq-algorithm');
 
-// ============ Helper: build minimal Open-Meteo response ============
+// ============ Hulpfunctie: bouw een minimale Open-Meteo-respons ============
 function buildWeather(targetDate, perHour) {
   // perHour: { temperature_2m, precipitation, wind_speed_10m, wind_gusts_10m, relative_humidity_2m, cloud_cover }
   // We genereren 24 uur voor targetDate, allemaal dezelfde waarden tenzij anders
@@ -30,7 +30,7 @@ function buildWeather(targetDate, perHour) {
   return { hourly };
 }
 
-// ============ analyzeDay — verdict thresholds ============
+// ============ analyzeDay: verdict-drempels ============
 test('analyzeDay: perfect BBQ weather → yes met hoge score', () => {
   const w = buildWeather(new Date('2026-06-15'), {
     temperature_2m: 22,
@@ -112,7 +112,7 @@ test('knockout tooWindy: gusts > 65 km/h capt score op 40', () => {
   assert.ok(r.score <= 40, `expected ≤40, got ${r.score}`);
 });
 
-// ============ Score smoothness ============
+// ============ Score-soepelheid ============
 test('analyzeDay: temp 25° = peak van temp-curve (geen aftrek)', () => {
   const w25 = buildWeather(new Date('2026-06-15'), {
     temperature_2m: 25, precipitation: 0, wind_speed_10m: 5,
@@ -138,7 +138,7 @@ test('analyzeDay: hoge wind verlaagt score zelfs zonder knockout', () => {
   assert.ok(r2.score < r1.score, `breezy ${r2.score} should be < calm ${r1.score}`);
 });
 
-// ============ Edge cases ============
+// ============ Randgevallen ============
 test('analyzeDay: geen evening data → null', () => {
   // Build weather met alleen ochtend-uren
   const w = {
@@ -157,7 +157,7 @@ test('analyzeDay: geen evening data → null', () => {
 });
 
 test('analyzeDay: alleen 17:00-21:00 worden geanalyseerd, niet midday', () => {
-  // Midday is extreem heet (35°), avond is 22° — verwacht avond-score, niet middag
+  // Middag is extreem heet (35°), avond is 22°. Het algoritme moet de avond pakken, niet de middag.
   const dateStr = '2026-07-15';
   const hourly = {
     time: [], temperature_2m: [], precipitation: [], wind_speed_10m: [],
@@ -210,7 +210,7 @@ test('analyzeWeek: returnt 7 dagen wanneer data beschikbaar', () => {
   }
 });
 
-// ============ Score range guard ============
+// ============ Score-bereik bewaken ============
 test('analyzeDay: score altijd in range 0-100', () => {
   // Test diverse combinaties
   const cases = [

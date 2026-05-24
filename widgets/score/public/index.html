@@ -238,7 +238,7 @@
     .fcell.maybe { background: linear-gradient(175deg, #FFD54F 0%, #F5A623 100%); color: #5A3D00; }
     .fcell.no    { background: linear-gradient(175deg, #E89B8B 0%, #A03818 100%); }
 
-    /* Mini-BBQ silhouet links in elke pill — visueel consistent met de Forecast-widget */
+    /* Mini-BBQ silhouet links in elke pill. Visueel consistent met de Forecast-widget. */
     .fcell .fbbq {
       width: 22px;
       height: 22px;
@@ -288,9 +288,10 @@
   </div>
 
   <script>
-    // ============ Weather-glyph picker (status-aware) ============
-    // yes-day defaultet naar zon tenzij echt overcast — Open-Meteo cloudCover
-    // is vaak hoog door hoge cirrus, dus drempel strenger.
+    // ============ Weer-glyph kiezer (kijkt naar status) ============
+    // Een ja-dag toont standaard de zon, tenzij het echt overcast is.
+    // Open-Meteo's cloudCover is vaak hoog door hoge cirrus, dus we
+    // hanteren een strengere drempel.
     function pickWeather(d) {
       const rain   = d.rain       ?? 0;
       const wind   = d.windSpeed  ?? 0;
@@ -309,7 +310,7 @@
       return 'sunny';
     }
 
-    // ============ Score → chip colour bucket ============
+    // ============ Score naar chip-kleurbucket ============
     function scoreBucket(score) {
       if (score == null) return 'chip-warm';
       if (score >= 70)  return 'chip-hot';
@@ -317,7 +318,7 @@
       return 'chip-cool';
     }
 
-    // ============ Weather line buckets ============
+    // ============ Buckets voor weer-tekstregel ============
     function windKey(kmh) {
       if (kmh == null) return null;
       if (kmh < 12) return 'light';
@@ -334,7 +335,7 @@
       if (mm < 2)    return 'showerExpected';
       return 'heavyRain';
     }
-    // Returns DOM nodes for safe insertion via replaceChildren().
+    // Geeft DOM-nodes terug zodat replaceChildren() ze veilig kan invoegen.
     function buildWeatherNodes(data, L) {
       const parts = [];
       if (data.temperature != null) parts.push(Math.round(data.temperature) + '°');
@@ -354,7 +355,7 @@
       return nodes;
     }
 
-    // ============ Main ============
+    // ============ Hoofdfunctie ============
     function onHomeyReady(Homey) {
       Homey.ready({ height: 260 });
       let L = null;
@@ -384,7 +385,7 @@
             const s = d.status || 'maybe';
             document.body.className = 'homey-widget ' + s;
 
-            // Swap weather glyph
+            // Wissel de weer-glyph (zon, wolk, regen, storm, wind, sneeuw).
             const wk = pickWeather(d);
             const nextSrc = 'assets/weather-' + wk + '.svg';
             if (!weatherImg.src.endsWith(nextSrc)) weatherImg.src = nextSrc;
@@ -393,7 +394,7 @@
             document.getElementById('num').textContent = score;
             document.getElementById('status').textContent = L.labels[s] || '—';
 
-            // Vlam schaalt mee met score: range 0.5 .. 1.1
+            // De vlam schaalt mee met de score, in een bereik van 0.5 tot 1.1.
             const flameScale = (0.5 + (score / 100) * 0.6).toFixed(2);
             document.documentElement.style.setProperty('--flame-scale', flameScale);
 
@@ -405,7 +406,7 @@
           }
 
           if (f && f.days) {
-            // Skip today (index 0), show the next 3 days
+            // Vandaag overslaan (index 0), de volgende 3 dagen tonen.
             const upcoming = f.days.slice(1, 4);
             const row = document.getElementById('forecastRow');
             row.replaceChildren();
@@ -443,7 +444,7 @@
         finally { refreshing = false; }
       }
       refresh();
-      // Lifecycle: capture interval id and clear on iframe unload.
+      // Lifecycle: interval-id bewaren en stoppen bij iframe-unload.
       const refreshTimer = setInterval(refresh, 5 * 60 * 1000);
       const cleanup = () => clearInterval(refreshTimer);
       window.addEventListener('pagehide', cleanup);

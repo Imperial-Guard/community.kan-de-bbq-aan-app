@@ -9,8 +9,8 @@
       margin: 0;
       font-family: var(--homey-font-family-regular, -apple-system, BlinkMacSystemFont, sans-serif);
       overflow: hidden;
-      /* Transparent — pills floaten op de Homey-dashboard achtergrond zelf,
-         dus past automatisch bij licht/donker thema zonder laag-effect. */
+      /* Transparant. De pills zweven op de dashboard-achtergrond van Homey
+         zelf, dus passen automatisch bij licht of donker thema. */
       background: transparent;
       color: var(--homey-text-color, #1B1B1B);
     }
@@ -101,8 +101,8 @@
       user-select: none;
       pointer-events: none;
     }
-    /* Sterke gevulde silhouet — leest beter op klein formaat dan een outline-tekening.
-       Op groen/rood draaien we naar wit voor contrast, op amber blijft hij donker. */
+    /* Sterk gevulde silhouet. Leest op klein formaat beter dan een outline-tekening.
+       Op groen en rood wordt de BBQ wit voor contrast; op amber blijft hij donker. */
     .cell.yes .icon .ikettle,
     .cell.no  .icon .ikettle {
       filter: brightness(0) invert(1);
@@ -182,9 +182,9 @@
       }
 
       refresh();
-      // Lifecycle: Homey SDK v3 has no documented widget teardown hook.
-      // We capture the interval id and clear it on iframe unload to prevent
-      // stacking if the dashboard re-mounts the widget.
+      // Lifecycle: in Homey SDK v3 is geen gedocumenteerde teardown-hook voor
+      // widgets. We bewaren het interval-id en stoppen het bij iframe-unload,
+      // zodat opnieuw mounten van het widget niet zorgt dat timers zich opstapelen.
       const refreshTimer = setInterval(refresh, 5 * 60 * 1000);
       const cleanup = () => clearInterval(refreshTimer);
       window.addEventListener('pagehide', cleanup);
