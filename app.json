@@ -1,0 +1,267 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "nl.bbqaan.app",
+  "version": "1.0.0",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "brandColor": "#D85A30",
+  "name": {
+    "en": "Kan de BBQ aan?",
+    "nl": "Kan de BBQ aan?"
+  },
+  "description": {
+    "en": "Never guess your BBQ weather again. Weather data by Open-Meteo.",
+    "nl": "Nooit meer gokken over het BBQ-weer. Weerdata van Open-Meteo."
+  },
+  "tags": {
+    "en": [
+      "BBQ",
+      "barbecue",
+      "grill",
+      "weather",
+      "outdoor",
+      "summer"
+    ],
+    "nl": [
+      "BBQ",
+      "barbecue",
+      "grill",
+      "weer",
+      "buiten",
+      "zomer"
+    ]
+  },
+  "category": [
+    "climate"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Paul Vermeulen",
+    "email": "33509000+Imperial-Guard@users.noreply.github.com"
+  },
+  "support": "https://github.com/Imperial-Guard/community.kan-de-bbq-aan-app/issues",
+  "source": "https://github.com/Imperial-Guard/community.kan-de-bbq-aan-app",
+  "bugs": {
+    "url": "https://github.com/Imperial-Guard/community.kan-de-bbq-aan-app/issues"
+  },
+  "flow": {
+    "triggers": [
+      {
+        "title": {
+          "en": "It's BBQ weather",
+          "nl": "Het is BBQ-weer"
+        },
+        "hint": {
+          "en": "Fires once when today's verdict turns into YES.",
+          "nl": "Start één keer wanneer het verdict van vandaag op JA komt."
+        },
+        "highlight": true,
+        "tokens": [
+          {
+            "name": "advice",
+            "type": "string",
+            "title": {
+              "en": "Advice",
+              "nl": "Advies"
+            },
+            "example": {
+              "en": "Fire it up",
+              "nl": "Kolen aan, zorgen uit"
+            }
+          },
+          {
+            "name": "score",
+            "type": "number",
+            "title": {
+              "en": "Score",
+              "nl": "Score"
+            },
+            "example": 84
+          }
+        ],
+        "id": "bbq_became_yes"
+      },
+      {
+        "title": {
+          "en": "BBQ verdict changed",
+          "nl": "BBQ-verdict is veranderd"
+        },
+        "hint": {
+          "en": "Fires when the BBQ verdict changes to yes, maybe or no.",
+          "nl": "Start wanneer het BBQ-verdict verandert naar ja, twijfel of nee."
+        },
+        "tokens": [
+          {
+            "name": "status",
+            "type": "string",
+            "title": {
+              "en": "Status",
+              "nl": "Status"
+            },
+            "example": "yes"
+          },
+          {
+            "name": "advice",
+            "type": "string",
+            "title": {
+              "en": "Advice",
+              "nl": "Advies"
+            },
+            "example": {
+              "en": "Fire it up",
+              "nl": "Kolen aan, zorgen uit"
+            }
+          },
+          {
+            "name": "score",
+            "type": "number",
+            "title": {
+              "en": "Score",
+              "nl": "Score"
+            },
+            "example": 84
+          }
+        ],
+        "id": "bbq_status_changed"
+      }
+    ],
+    "conditions": [
+      {
+        "title": {
+          "en": "BBQ score is !{{higher|lower}} than",
+          "nl": "BBQ-score is !{{hoger|lager}} dan"
+        },
+        "titleFormatted": {
+          "en": "BBQ score is !{{higher|lower}} than [[score]]",
+          "nl": "BBQ-score is !{{hoger|lager}} dan [[score]]"
+        },
+        "args": [
+          {
+            "name": "score",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "title": {
+              "en": "Score",
+              "nl": "Score"
+            },
+            "placeholder": {
+              "en": "Score",
+              "nl": "Score"
+            }
+          }
+        ],
+        "id": "bbq_score_above"
+      },
+      {
+        "title": {
+          "en": "It !{{is|isn't}} BBQ weather",
+          "nl": "Het !{{is|is geen}} BBQ-weer"
+        },
+        "hint": {
+          "en": "True when the current verdict is YES.",
+          "nl": "Waar wanneer het huidige verdict JA is."
+        },
+        "id": "is_bbq_weather"
+      }
+    ],
+    "actions": [
+      {
+        "title": {
+          "en": "Refresh BBQ data",
+          "nl": "Ververs BBQ-data"
+        },
+        "hint": {
+          "en": "Forces a fresh fetch from the weather service.",
+          "nl": "Forceert een verse ophaal bij de weerdienst."
+        },
+        "id": "refresh_now"
+      }
+    ]
+  },
+  "widgets": {
+    "forecast": {
+      "name": {
+        "en": "BBQ Forecast",
+        "nl": "BBQ-vooruitblik"
+      },
+      "height": 140,
+      "transparent": true,
+      "api": {
+        "getForecast": {
+          "method": "GET",
+          "path": "/forecast"
+        },
+        "getI18n": {
+          "method": "GET",
+          "path": "/i18n"
+        }
+      },
+      "id": "forecast",
+      "settings": []
+    },
+    "score": {
+      "name": {
+        "en": "BBQ Score",
+        "nl": "BBQ-score"
+      },
+      "height": 260,
+      "transparent": true,
+      "api": {
+        "getStatus": {
+          "method": "GET",
+          "path": "/status"
+        },
+        "getForecast": {
+          "method": "GET",
+          "path": "/forecast"
+        },
+        "getI18n": {
+          "method": "GET",
+          "path": "/i18n"
+        }
+      },
+      "id": "score",
+      "settings": []
+    },
+    "verdict": {
+      "name": {
+        "en": "BBQ Verdict",
+        "nl": "BBQ-verdict"
+      },
+      "height": 220,
+      "transparent": true,
+      "settings": [
+        {
+          "id": "show_details",
+          "type": "checkbox",
+          "title": {
+            "en": "Show weather details",
+            "nl": "Toon weerdetails"
+          },
+          "value": true
+        }
+      ],
+      "api": {
+        "getStatus": {
+          "method": "GET",
+          "path": "/status"
+        },
+        "getI18n": {
+          "method": "GET",
+          "path": "/i18n"
+        }
+      },
+      "id": "verdict"
+    }
+  }
+}
