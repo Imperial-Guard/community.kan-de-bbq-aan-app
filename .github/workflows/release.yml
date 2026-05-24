@@ -56,4 +56,6 @@ jobs:
       - name: Publish to Homey App Store
         uses: athombv/github-action-homey-app-publish@master
         with:
-          personal_access_token: ${{ secrets.HOMEY_PAT }}
+          # Secret name in this repo is HOMEY (not HOMEY_PAT). Must be a
+          # Personal Access Token from https://tools.developer.homey.app/me.
+          personal_access_token: ${{ secrets.HOMEY }}
