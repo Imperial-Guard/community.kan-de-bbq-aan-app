@@ -8,12 +8,12 @@
   ],
   "brandColor": "#D85A30",
   "name": {
-    "en": "Kan de BBQ aan?",
+    "en": "Is It BBQ Weather?",
     "nl": "Kan de BBQ aan?"
   },
   "description": {
-    "en": "Never guess your BBQ weather again. Weather data by Open-Meteo.",
-    "nl": "Nooit meer gokken over het BBQ-weer. Weerdata van Open-Meteo."
+    "en": "Never guess your BBQ weather again.",
+    "nl": "Nooit meer gokken over het BBQ-weer."
   },
   "tags": {
     "en": [
